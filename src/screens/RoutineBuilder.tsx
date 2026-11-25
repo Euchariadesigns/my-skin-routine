@@ -13,7 +13,7 @@ import { useProducts, useRoutines } from '../hooks/data'
 import { processPhoto } from '../lib/photo'
 
 const BUILT_IN_TAGS = ['exfoliation', 'recovery', 'retinoid', 'slugging']
-const EXAMPLE_NAME: Record<Tod, string> = { am: 'Arcwell morning', pm: 'Exfoliating evening' }
+const EXAMPLE_NAME: Record<Tod, string> = { am: 'Acwell morning', pm: 'Exfoliating evening' }
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
 export function RoutineBuilder() {

@@ -8,11 +8,8 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router'
 import App from './App'
 import { applyPaperGrain } from './lib/grain'
-import { isInstalled, isIOS } from './lib/notify'
 
 applyPaperGrain()
-// Safari's floating address bar covers the bottom of the page; installed apps don't have one.
-if (isIOS() && !isInstalled()) document.documentElement.classList.add('ios-browser')
 
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {

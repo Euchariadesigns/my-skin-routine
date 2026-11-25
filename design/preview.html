@@ -542,7 +542,7 @@ const P = {
   hydrator: { name: 'Hydrator', cat: 'Hydrator', art: 'bottle', c: 'peach' },
   merytino: { name: 'Merytino', cat: 'Moisturizer', art: 'jar', c: 'blush' },
   spf:      { name: 'Sunscreen', cat: 'Sunscreen', art: 'tube', c: 'butter' },
-  arcwell:  { name: 'Arcwell', cat: 'Treatment', art: 'dropper', c: 'butter' },
+  arcwell:  { name: 'Acwell', cat: 'Treatment', art: 'dropper', c: 'butter' },
   nimbosin: { name: 'Nimbosin', cat: 'Treatment', art: 'tube', c: 'lilac' },
   lactic:   { name: 'Lactic acid', cat: 'Treatment', art: 'bottle', c: 'sage' },
   azelaic:  { name: 'Azelaic acid', cat: 'Treatment', note: 'The tube with the green cap' },
@@ -550,7 +550,7 @@ const P = {
 };
 /* each routine is the products the person uses, in their order. products that aren't in every routine for that time of day get highlighted: they're what makes the routine different. */
 const R = {
-  arcwell:  { id: 'arcwell',  name: 'Arcwell morning',      tod: 'am', order: ['facewash', 'arcwell', 'hydrator', 'merytino', 'spf'],  tags: [] },
+  arcwell:  { id: 'arcwell',  name: 'Acwell morning',      tod: 'am', order: ['facewash', 'arcwell', 'hydrator', 'merytino', 'spf'],  tags: [] },
   nimbosin: { id: 'nimbosin', name: 'Nimbosin morning',     tod: 'am', order: ['facewash', 'nimbosin', 'hydrator', 'merytino', 'spf'], tags: [] },
   lactic:   { id: 'lactic',   name: 'Exfoliating evening',  tod: 'pm', order: ['facewash', 'lactic', 'hydrator', 'merytino'],          tags: ['exfoliation'] },
   recovery: { id: 'recovery', name: 'Recovery evening',     tod: 'pm', order: ['facewash', 'hydrator', 'merytino'],                    tags: ['recovery'] },
@@ -910,7 +910,7 @@ function renderRoutines() {
 
 /* routine builder: the person adds their own products (photo + the name on the bottle), puts them in order and names the routine */
 const todWord = t => t === 'am' ? 'morning' : 'evening';
-const EXAMPLE_NAME = { am: 'Arcwell morning', pm: 'Exfoliating evening' };
+const EXAMPLE_NAME = { am: 'Acwell morning', pm: 'Exfoliating evening' };
 const obProducts = [];
 let rb = null, npPhoto = null, uid = 0;
 const newId = prefix => `${prefix}${Date.now().toString(36)}${uid++}`;

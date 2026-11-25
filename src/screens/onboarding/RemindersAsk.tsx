@@ -58,7 +58,7 @@ export function RemindersAsk() {
                     <li key={id} style={{ '--i': i } as CSSProperties}>
                       <span className="n">{i + 1}</span>
                       <span className="ob-thumb" style={{ '--r': `${STACK_TILTS[i % STACK_TILTS.length]}deg` } as CSSProperties}>
-                        <ProductPic product={byId.get(id)} size={44} />
+                        <ProductPic product={byId.get(id)} size={32} />
                       </span>
                       <span>{byId.get(id)?.name}</span>
                     </li>

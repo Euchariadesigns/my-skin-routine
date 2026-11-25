@@ -7,10 +7,9 @@ import { isInstalled, isIOS } from '../../lib/notify'
 
 const SAMPLE: { name: string; shape: ArtShape; color: ArtColor }[] = [
   { name: 'Face wash', shape: 'pump', color: 'sky' },
-  { name: 'Arcwell', shape: 'dropper', color: 'butter' },
-  { name: 'Hydrator', shape: 'bottle', color: 'peach' },
-  { name: 'Merytino', shape: 'jar', color: 'blush' },
-  { name: 'Sunscreen', shape: 'tube', color: 'butter' },
+  { name: 'Acwell', shape: 'dropper', color: 'butter' },
+  { name: 'Moisturizer', shape: 'jar', color: 'blush' },
+  { name: 'Sunscreen', shape: 'tube', color: 'peach' },
 ]
 export const STACK_TILTS = [-7, 5, -3, 8, -5]
 
@@ -26,13 +25,13 @@ export function Welcome() {
           <div className="ob-card" role="img" aria-label="An example morning routine with each product pictured in order">
             <div className="ob-top"><Icon name="sun" /><span>This morning</span><span className="t">{date}</span></div>
             <div className="ob-panel">
-              <span className="rn">Arcwell morning</span>
+              <span className="rn">Acwell morning</span>
               <ol className="ob-stack">
                 {SAMPLE.map((p, i) => (
                   <li key={p.name} style={{ '--i': i } as CSSProperties}>
                     <span className="n">{i + 1}</span>
                     <span className="ob-thumb" style={{ '--r': `${STACK_TILTS[i]}deg` } as CSSProperties}>
-                      <Art shape={p.shape} color={p.color} style={{ height: 44 }} />
+                      <Art shape={p.shape} color={p.color} style={{ height: 32 }} />
                     </span>
                     <span>{p.name}</span>
                   </li>
