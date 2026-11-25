@@ -243,6 +243,16 @@ a{color:inherit}
 .ob-yday{display:flex;align-items:center;gap:8px;margin-top:6px;padding-top:10px;border-top:1px dashed var(--line);font-size:12px;color:var(--ink-soft)}
 .ob-yday .ic{width:16px;height:16px;color:var(--ultra)}
 .ob-why{font-size:14px;line-height:1.55;color:var(--ink);text-align:center;max-width:34ch}
+.ob-cluster{position:relative;width:156px;height:104px}
+.ob-cluster .art{position:absolute;bottom:2px}
+.ob-cluster .art svg{height:80px}
+.ob-cluster .a1{left:4px;transform:rotate(-14deg)}
+.ob-cluster .a2{left:50px;bottom:10px;z-index:2;transform:rotate(3deg)}
+.ob-cluster .a2 svg{height:90px}
+.ob-cluster .a3{left:96px;transform:rotate(13deg)}
+.ob-photo{width:38px;height:44px;object-fit:cover;border:3px solid var(--edge);border-radius:9px;box-shadow:0 3px 6px var(--shadow-soft)}
+.row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.np-lib{align-self:flex-start;padding-left:2px}
 .ob-times{font-size:13px;color:var(--ink-soft);text-align:center;max-width:34ch}
 .ob-actions{margin-top:4px;width:100%;display:flex;flex-direction:column;gap:6px}
 .ob-actions .btn{min-height:52px;font-size:15px;border-radius:16px}
@@ -315,18 +325,17 @@ a{color:inherit}
         <div class="ob-top"><span class="ic" data-icon="sun"></span><span>This morning</span><span class="t" id="obDate"></span></div>
         <div class="ob-panel"><span class="rn" id="obName"></span><ol class="ob-stack" id="obStack"></ol><p class="ob-yday" id="obYday"></p></div>
       </div>
-      <p class="ob-why">Add your morning and night routines once. Each day, the app shows you what’s next and reminds you when it’s time.</p>
+      <p class="ob-why">Add your morning and night routines once. Each day, we’ll show you what’s next and remind you when it’s time.</p>
       <div class="ob-actions">
-        <button class="btn btn-primary" id="obYes" type="button">Send me reminders</button>
-        <button class="btn btn-quiet" id="obNo" type="button">Not now</button>
+        <button class="btn btn-primary" id="obStart" type="button">Add my products</button>
+        <button class="btn btn-quiet" id="obLook" type="button">Show me an example first</button>
       </div>
-      <p class="ob-times">Reminders come at 7:30 am and 9:00 pm. You can change the times anytime.</p>
     </div>
   </section>
 
   <section class="onboard" id="plan" aria-labelledby="planTitle" hidden>
     <div class="ob-inner">
-      <span class="ob-icon" data-icon="page"></span>
+      <div class="ob-cluster" id="planArt" aria-hidden="true"></div>
       <h1 class="ob-title" id="planTitle">Plan your skincare routine by adding your <em>morning</em> and <em>night</em> routines.</h1>
       <p class="ob-times">Add the products you use, take a photo of each one, and give it the name on the bottle.</p>
       <div class="plan-list" id="planList"></div>
@@ -335,6 +344,21 @@ a{color:inherit}
         <button class="btn btn-ghost" id="planPm" type="button">Add a night routine</button>
         <button class="btn btn-quiet" id="planDone" type="button">Skip for now</button>
       </div>
+    </div>
+  </section>
+
+  <section class="onboard" id="remind" aria-labelledby="remTitle" hidden>
+    <div class="ob-inner">
+      <h1 class="ob-title" id="remTitle">Want a <em>reminder</em> when it’s time?</h1>
+      <div class="ob-card" role="img" aria-label="A sample reminder showing your routine and its products">
+        <div class="ob-top"><span class="ic" id="remIcon"></span><span id="remWhen"></span><span class="t" id="remTime"></span></div>
+        <div class="ob-panel"><span class="rn" id="remName"></span><ol class="ob-stack" id="remStack"></ol></div>
+      </div>
+      <div class="ob-actions">
+        <button class="btn btn-primary" id="obYes" type="button">Send me reminders</button>
+        <button class="btn btn-quiet" id="obNo" type="button">Not now</button>
+      </div>
+      <p class="ob-times">We’ll remind you at 7:30 am and 9:00 pm. You can change the times anytime.</p>
     </div>
   </section>
 
@@ -412,8 +436,9 @@ a{color:inherit}
     <label class="field"><span>Note <em>(optional)</em></span><input type="text" id="p-note" autocomplete="off" placeholder="For example, the tube with the green cap"></label>
     <div class="field"><span>Photo <em>(optional)</em></span>
       <div class="photo-row">
-        <label class="btn btn-ghost" for="p-photo"><span class="ic" data-icon="camera"></span>Take or choose a photo</label>
-        <input type="file" id="p-photo" accept="image/*" class="sr">
+        <div class="row2"><label class="btn btn-ghost" for="p-photo"><span class="ic" data-icon="camera"></span>Take a photo</label><label class="btn btn-ghost" for="p-lib">Choose from photos</label></div>
+        <input type="file" id="p-photo" accept="image/*" capture="environment" class="sr">
+        <input type="file" id="p-lib" accept="image/*" class="sr">
         <div class="pastezone" id="p-paste" contenteditable="true" role="textbox" aria-label="Paste a cut-out image here" data-ph="Or press and hold here to paste a cut-out"></div>
         <p class="hint" id="p-hint">Photos stay on your phone.</p>
       </div>
@@ -439,11 +464,13 @@ a{color:inherit}
     <div class="field" id="r-shelf-field"><span>Already on your shelf <em>Tap one to add it</em></span><div class="chips" id="r-shelf"></div></div>
     <div class="field"><span>Add a new product</span>
       <div class="newprod">
-        <label class="np-photo" for="np-file" id="np-photo" aria-label="Take or choose a photo"></label>
-        <input type="file" id="np-file" accept="image/*" class="sr">
+        <label class="np-photo" for="np-file" id="np-photo" aria-label="Take a photo"></label>
+        <input type="file" id="np-file" accept="image/*" capture="environment" class="sr">
         <input type="text" id="np-name" autocomplete="off" placeholder="Name on the bottle" aria-label="Product name">
         <button type="button" class="btn btn-ghost" id="np-add">Add</button>
       </div>
+      <label class="linkbtn np-lib" for="np-lib">Or choose a photo you already have</label>
+      <input type="file" id="np-lib" accept="image/*" class="sr">
     </div>
     <label class="field"><span id="r-name-label">What do you want to call this morning routine?</span><input type="text" id="r-name" autocomplete="off"></label>
     <div class="more" id="r-more">
@@ -846,6 +873,7 @@ async function loadPhoto(file) {
 $('#addForm').addEventListener('input', e => { if (e.target.id !== 'p-paste') { $('#p-err').hidden = true; updatePreview(); } });
 $('#addForm').addEventListener('change', updatePreview);
 $('#p-photo').addEventListener('change', e => loadPhoto(e.target.files[0]));
+$('#p-lib').addEventListener('change', e => loadPhoto(e.target.files[0]));
 $('#p-paste').addEventListener('paste', e => {
   e.preventDefault();
   const it = [...((e.clipboardData && e.clipboardData.items) || [])].find(i => i.type.startsWith('image/'));
@@ -906,7 +934,7 @@ function rbRender() {
   $('#r-name-label').textContent = `What do you want to call this ${todWord(rb.tod)} routine?`;
   $('#r-name').placeholder = `For example, ${EXAMPLE_NAME[rb.tod]}`;
 }
-function resetNewProduct() { npPhoto = null; $('#np-name').value = ''; $('#np-file').value = ''; $('#np-photo').innerHTML = ICON.camera; }
+function resetNewProduct() { npPhoto = null; $('#np-name').value = ''; $('#np-file').value = ''; $('#np-lib').value = ''; $('#np-photo').innerHTML = ICON.camera; }
 function addNewProduct() {
   const name = $('#np-name').value.trim();
   if (!name) { $('#np-name').focus(); toast('Type the name on the bottle first.'); return; }
@@ -927,7 +955,9 @@ $('#r-tod').addEventListener('change', e => { rb.tod = e.target.value; rbRender(
 $('#r-shelf').addEventListener('click', e => { const b = e.target.closest('[data-add]'); if (!b) return; rb.order.push(b.dataset.add); rbRender(); });
 $('#np-add').addEventListener('click', addNewProduct);
 $('#np-name').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addNewProduct(); } });
-$('#np-file').addEventListener('change', async e => { const ph = await readPhoto(e.target.files[0]); if (!ph) return; npPhoto = ph; $('#np-photo').innerHTML = `<img src="${ph.url}" alt="">`; $('#np-name').focus(); });
+async function useNewPhoto(e) { const ph = await readPhoto(e.target.files[0]); if (!ph) return; npPhoto = ph; $('#np-photo').innerHTML = `<img src="${ph.url}" alt="">`; $('#np-name').focus(); }
+$('#np-file').addEventListener('change', useNewPhoto);
+$('#np-lib').addEventListener('change', useNewPhoto);
 $('#r-order').addEventListener('click', e => {
   const rm = e.target.closest('[data-rm]');
   if (rm) { rb.order = rb.order.filter(x => x !== rm.dataset.rm); rbRender(); return; }
@@ -1028,30 +1058,54 @@ $('#v-notifications').addEventListener('click', e => {
 });
 function renderBadge() { const c = notes.filter(n => n.unread).length, b = $('#badge'); b.hidden = !c; b.textContent = c; }
 
-/* ---------- first-time screens: reminders, then planning ---------- */
+/* ---------- first-time screens: why we exist, then planning, then reminders ---------- */
 let obFrom = 'start';
 const planned = [];
-function openOnboard(from = 'start') {
-  obFrom = from; document.body.classList.add('ob-open'); $('#plan').hidden = true; $('#onboard').hidden = false; window.scrollTo(0, 0);
-  if (!RM) $$('#obStack li').forEach((li, i) => li.animate([{ opacity: 0, transform: 'translateY(-10px) scale(1.06)' }, { opacity: 1, transform: 'none' }], { duration: 420, delay: 250 + i * 110, easing: 'cubic-bezier(.2,.9,.3,1.2)', fill: 'backwards' }));
+const OB = ['onboard', 'plan', 'remind'];
+function stackPic(p) {
+  if (p.photo) return `<img class="ob-photo" src="${p.photo.url}" alt="">`;
+  if (p.art) return `<span class="art" style="--c:var(--${p.c})">${ART[p.art]}</span>`;
+  return `<span class="noart">${ICON[catIcon(p.cat)]}</span>`;
 }
-function showPlan() { $('#onboard').hidden = true; $('#plan').hidden = false; renderPlan(); window.scrollTo(0, 0); }
+const stackHTML = r => stepsOf(r).map((k, i) => `<li><span class="n">${i + 1}</span><span class="ob-thumb" style="--r:${[-7, 5, -3, 8, -5][i % 5]}deg">${stackPic(P[k])}</span><span>${esc(P[k].name)}</span></li>`).join('');
+function dropIn(sel) { if (!RM) $$(sel + ' li').forEach((li, i) => li.animate([{ opacity: 0, transform: 'translateY(-10px) scale(1.06)' }, { opacity: 1, transform: 'none' }], { duration: 420, delay: 250 + i * 110, easing: 'cubic-bezier(.2,.9,.3,1.2)', fill: 'backwards' })); }
+function showOb(id) { document.body.classList.add('ob-open'); OB.forEach(x => { $('#' + x).hidden = x !== id; }); window.scrollTo(0, 0); }
+function openOnboard(from = 'start') { obFrom = from; if (from === 'start') { showOb('onboard'); dropIn('#obStack'); } else showReminders(); }
+function showPlan() {
+  showOb('plan'); renderPlan();
+  if (!RM) $$('#planArt svg').forEach((s, i) => s.animate([{ opacity: 0, transform: 'translateY(-16px) scale(1.08)' }, { opacity: 1, transform: 'none' }], { duration: 440, delay: 120 + i * 120, easing: 'cubic-bezier(.2,.9,.3,1.25)', fill: 'backwards' }));
+}
+function showReminders() {
+  const r = planned.length ? R[planned[0]] : R.arcwell, am = r.tod === 'am';
+  $('#remIcon').innerHTML = ICON[am ? 'sun' : 'moon'];
+  $('#remWhen').textContent = am ? 'This morning' : 'Tonight';
+  $('#remTime').textContent = am ? '7:30 am' : '9:00 pm';
+  $('#remName').textContent = r.name;
+  $('#remStack').innerHTML = stackHTML(r);
+  showOb('remind'); dropIn('#remStack');
+}
 function closeOnboard() {
-  document.body.classList.remove('ob-open'); $('#onboard').hidden = true; $('#plan').hidden = true; window.scrollTo(0, 0);
+  document.body.classList.remove('ob-open'); OB.forEach(x => { $('#' + x).hidden = true; }); window.scrollTo(0, 0);
   if (location.hash === '' || location.hash === '#today') setTimeout(tease, 650);
 }
 function renderPlan() {
   $('#planList').innerHTML = planned.map(id => `<p class="plan-row">${ic(R[id].tod === 'am' ? 'sun' : 'moon')}<span>${esc(R[id].name)}, ${R[id].order.length} product${R[id].order.length === 1 ? '' : 's'}</span>${ic('check', 'ok')}</p>`).join('');
-  $('#planDone').textContent = planned.length ? 'I’m done, show me my day' : 'Skip for now';
-  $('#planDone').className = planned.length ? 'btn btn-primary' : 'btn btn-quiet';
-  $('#planAm').className = planned.length ? 'btn btn-ghost' : 'btn btn-primary';
+  const hasAm = planned.some(id => R[id].tod === 'am'), hasPm = planned.some(id => R[id].tod === 'pm');
+  const next = !hasAm ? 'planAm' : !hasPm ? 'planPm' : 'planDone';
+  $('#planAm').textContent = hasAm ? 'Add another morning routine' : 'Add a morning routine';
+  $('#planPm').textContent = hasPm ? 'Add another night routine' : 'Add a night routine';
+  $('#planDone').textContent = planned.length ? 'I’m done adding routines' : 'Skip for now';
+  $('#planAm').className = next === 'planAm' ? 'btn btn-primary' : 'btn btn-ghost';
+  $('#planPm').className = next === 'planPm' ? 'btn btn-primary' : 'btn btn-ghost';
+  $('#planDone').className = next === 'planDone' ? 'btn btn-primary' : 'btn btn-quiet';
 }
-const afterReminders = () => obFrom === 'start' ? showPlan() : closeOnboard();
-$('#obYes').addEventListener('click', () => { state.push = true; renderNotes(); toast('In the real app, your phone asks you to allow notifications here.'); afterReminders(); });
-$('#obNo').addEventListener('click', () => { toast('Reminders will still show in the app. You can turn on phone reminders anytime.'); afterReminders(); });
+$('#obStart').addEventListener('click', showPlan);
+$('#obLook').addEventListener('click', () => { closeOnboard(); toast('This is an example day. You can add your own routines anytime.'); });
+$('#obYes').addEventListener('click', () => { state.push = true; renderNotes(); closeOnboard(); toast('In the real app, your phone asks you to allow notifications here.'); });
+$('#obNo').addEventListener('click', () => { closeOnboard(); toast('No problem. We’ll still remind you inside the app.'); });
 $('#planAm').addEventListener('click', () => openBuilder('am', 'plan'));
 $('#planPm').addEventListener('click', () => openBuilder('pm', 'plan'));
-$('#planDone').addEventListener('click', () => { const had = planned.length; closeOnboard(); if (had) toast('In the real app, your new routines show up here on their days.'); });
+$('#planDone').addEventListener('click', () => { if (planned.length) showReminders(); else closeOnboard(); });
 
 /* ---------- routing ---------- */
 const VIEWS = ['today', 'shelf', 'routines', 'history', 'notifications'];
@@ -1084,10 +1138,8 @@ $('#dWk').textContent = WD[TODAY.getDay()];
 $('#dMo').textContent = `${MO[TODAY.getMonth()]} ${TODAY.getFullYear()}`;
 $('#obDate').textContent = `${WD[TODAY.getDay()].slice(0, 3)} ${TODAY.getDate()} ${MO[TODAY.getMonth()].slice(0, 3)}`;
 $('#obName').textContent = R.arcwell.name;
-$('#obStack').innerHTML = stepsOf(R.arcwell).map((k, i) => {
-  const p = P[k], pic = p.art ? `<span class="art" style="--c:var(--${p.c})">${ART[p.art]}</span>` : `<span class="noart">${ICON[catIcon(p.cat)]}</span>`;
-  return `<li><span class="n">${i + 1}</span><span class="ob-thumb" style="--r:${[-7, 5, -3, 8, -5][i % 5]}deg">${pic}</span><span>${esc(p.name)}</span></li>`;
-}).join('');
+$('#obStack').innerHTML = stackHTML(R.arcwell);
+$('#planArt').innerHTML = [['pump', 'sky', 'a1'], ['dropper', 'butter', 'a2'], ['jar', 'blush', 'a3']].map(([a, c, cls]) => `<span class="art ${cls}" style="--c:var(--${c})">${ART[a]}</span>`).join('');
 $('#obYday').innerHTML = `${ic('check')}<span>Yesterday you used ${esc(logsFor(1)[0].r.name)}.</span>`;
 renderAM(); renderPM(); renderNext(); renderShelf(); renderBadge();
 show(location.hash.slice(1));
@@ -1097,7 +1149,7 @@ if (!location.hash) openOnboard('start');
 try {
   const q = new URLSearchParams(location.search);
   if (q.has('peel')) {
-    document.body.classList.remove('ob-open'); $('#onboard').hidden = true; $('#plan').hidden = true;
+    document.body.classList.remove('ob-open'); OB.forEach(x => { $('#' + x).hidden = true; });
     setTimeout(() => {
       const st = $('#slot-am .stage'); st.classList.add('peeling'); dims(st);
       const t = parseFloat(q.get('peel')), u = 1 - t, a = rest(st), c = peelCtrl(st), b = peelEnd(st);
