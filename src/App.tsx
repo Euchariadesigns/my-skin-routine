@@ -1,8 +1,81 @@
-export default function App() {
+import { useEffect } from 'react'
+import { Navigate, Outlet, Route, Routes, useLocation } from 'react-router'
+import { TabBar } from './components/TabBar'
+import { ToastProvider } from './components/Toast'
+import { generateDueNotifications } from './domain/actions'
+import { useSettings } from './hooks/data'
+import { History } from './screens/History'
+import { Notifications } from './screens/Notifications'
+import { Plan } from './screens/onboarding/Plan'
+import { RemindersAsk } from './screens/onboarding/RemindersAsk'
+import { Welcome } from './screens/onboarding/Welcome'
+import { ProductForm } from './screens/ProductForm'
+import { RoutineBuilder } from './screens/RoutineBuilder'
+import { Routines } from './screens/Routines'
+import { SettingsScreen } from './screens/Settings'
+import { Shelf } from './screens/Shelf'
+import { DayView, Today } from './screens/Today'
+
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+  return null
+}
+
+/** Checks for due reminders when the app opens, every minute while it's open, and when it comes back to the front. */
+function useReminderTicker(enabled: boolean) {
+  useEffect(() => {
+    if (!enabled) return
+    const run = () => { void generateDueNotifications() }
+    run()
+    const timer = window.setInterval(run, 60_000)
+    const onVisible = () => { if (document.visibilityState === 'visible') run() }
+    document.addEventListener('visibilitychange', onVisible)
+    return () => {
+      window.clearInterval(timer)
+      document.removeEventListener('visibilitychange', onVisible)
+    }
+  }, [enabled])
+}
+
+function Tabs({ onboarded }: { onboarded: boolean }) {
+  if (!onboarded) return <Navigate to="/welcome" replace />
   return (
-    <main style={{ fontFamily: 'system-ui, sans-serif', padding: '2rem 1rem', maxWidth: 480, margin: '0 auto' }}>
-      <h1>My Skin Routine</h1>
-      <p>Your morning and evening routines, all in one place. Coming soon.</p>
-    </main>
+    <>
+      <main className="page with-tabs"><Outlet /></main>
+      <TabBar />
+    </>
+  )
+}
+
+export default function App() {
+  const settings = useSettings()
+  useReminderTicker(!!settings?.onboarded && !!settings?.remindersOn)
+  if (!settings) return <div className="page loading" />
+  return (
+    <ToastProvider>
+      <ScrollToTop />
+      <Routes>
+        <Route path="/welcome" element={<Welcome />} />
+        <Route path="/plan" element={<Plan />} />
+        <Route path="/reminders" element={<RemindersAsk />} />
+        <Route path="/routine/new" element={<RoutineBuilder />} />
+        <Route path="/routine/:id" element={<RoutineBuilder />} />
+        <Route path="/product/new" element={<ProductForm />} />
+        <Route path="/product/:id" element={<ProductForm />} />
+        <Route path="/settings" element={<SettingsScreen />} />
+        <Route element={<Tabs onboarded={settings.onboarded} />}>
+          <Route index element={<Today />} />
+          <Route path="day/:date" element={<DayView />} />
+          <Route path="shelf" element={<Shelf />} />
+          <Route path="routines" element={<Routines />} />
+          <Route path="history" element={<History />} />
+          <Route path="notifications" element={<Notifications />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </ToastProvider>
   )
 }
