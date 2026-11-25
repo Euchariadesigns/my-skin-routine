@@ -135,7 +135,7 @@ a{color:inherit}
 .tile-art > *{transform:rotate(var(--tilt,0deg))}
 .art{display:flex}
 .art svg{height:110px;width:auto;filter:drop-shadow(3px 0 0 var(--edge)) drop-shadow(-3px 0 0 var(--edge)) drop-shadow(0 3px 0 var(--edge)) drop-shadow(0 -3px 0 var(--edge)) drop-shadow(0 7px 7px var(--shadow-soft))}
-.art .b{fill:var(--c)} .art .d{fill:color-mix(in oklab,var(--c),var(--ink) 40%)} .art .l{fill:var(--edge);opacity:.72} .art .k{fill:var(--ink);opacity:.22}
+.art .b,.thumb-art .b{fill:var(--c)} .art .d,.thumb-art .d{fill:color-mix(in oklab,var(--c),var(--ink) 40%)} .art .l,.thumb-art .l{fill:var(--edge);opacity:.72} .art .k,.thumb-art .k{fill:var(--ink);opacity:.22}
 .cutout{max-height:116px;max-width:100%;filter:drop-shadow(3px 0 0 var(--edge)) drop-shadow(-3px 0 0 var(--edge)) drop-shadow(0 3px 0 var(--edge)) drop-shadow(0 -3px 0 var(--edge)) drop-shadow(0 7px 7px var(--shadow-soft))}
 .photo{width:96px;height:112px;object-fit:cover;border:5px solid var(--edge);border-radius:16px;box-shadow:0 8px 14px -8px var(--shadow)}
 .noart{width:78px;height:78px;border-radius:50%;border:1.5px dashed var(--line);display:flex;align-items:center;justify-content:center;color:var(--ultra)}
@@ -257,8 +257,11 @@ a{color:inherit}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chips label{position:relative;cursor:pointer}
 .chips input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
-.chips span{display:inline-flex;height:36px;align-items:center;padding:0 14px;border-radius:999px;background:var(--face-plain);box-shadow:inset 0 0 0 1px var(--line);font-size:13px}
-.chips input:checked + span{background:var(--ultra);color:var(--ultra-ink);box-shadow:none}
+.chips span,.addchip{display:inline-flex;height:36px;align-items:center;gap:7px;padding:0 14px;border-radius:999px;background:var(--face-plain);box-shadow:inset 0 0 0 1px var(--line);font-size:13px;color:var(--ink)}
+.chips input:checked + span{background:var(--face-pm);color:var(--ultra);box-shadow:inset 0 0 0 1.5px var(--ultra);padding-left:12px}
+.chips input:checked + span::before{content:"";width:5px;height:9px;border:solid currentColor;border-width:0 1.8px 1.8px 0;transform:translateY(-1px) rotate(45deg)}
+.addchip{appearance:none;border:0;font-family:var(--font-mono);cursor:pointer}
+.addchip::before{content:"+";color:var(--ultra)}
 .chips input:focus-visible + span{outline:2px solid var(--ultra);outline-offset:2px}
 .chips + input[type="text"]{margin-top:8px}
 .photo-row{display:flex;flex-direction:column;gap:8px}
@@ -268,9 +271,18 @@ a{color:inherit}
 .hint{font-size:12px;color:var(--ink-soft)}
 .err{font-size:13px;color:var(--ultra)}
 .sheet-actions{display:flex;justify-content:flex-end;gap:8px}
-.checks{display:flex;flex-direction:column;gap:6px}
-.check{display:flex;align-items:center;gap:10px;font-size:14px;min-height:44px;padding:8px 12px;border-radius:12px;background:var(--face-plain);box-shadow:inset 0 0 0 1px var(--line);cursor:pointer}
-.check input{width:18px;height:18px;margin:0;accent-color:var(--ultra)}
+.more{display:flex;flex-direction:column;gap:18px}
+.newprod{display:flex;align-items:center;gap:8px;padding:6px;border-radius:14px;background:var(--face-plain);box-shadow:inset 0 0 0 1px var(--line)}
+.np-photo{flex:none;width:46px;height:46px;border-radius:11px;border:1.5px dashed var(--line);display:flex;align-items:center;justify-content:center;color:var(--ultra);cursor:pointer;overflow:hidden}
+.np-photo svg{width:22px;height:22px}
+.np-photo img{width:100%;height:100%;object-fit:cover}
+.field .newprod input[type="text"]{flex:1;min-width:0;border:0;background:transparent;padding:0 6px;height:46px}
+.newprod .btn{min-height:40px;padding:8px 14px}
+.thumb{width:34px;height:34px;border-radius:9px;flex:none;object-fit:cover;border:2px solid var(--edge);box-shadow:0 2px 5px var(--shadow-soft)}
+.thumb-art,.thumb-none{display:inline-flex;align-items:center;justify-content:center;background:var(--face-plain);color:var(--ultra)}
+.thumb-art svg{height:26px;width:auto}
+.thumb-none svg{width:18px;height:18px}
+.order .nm{min-width:0;overflow-wrap:anywhere}
 .order{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
 .order li{display:flex;align-items:center;gap:10px;min-height:46px;padding:4px 6px 4px 12px;border-radius:12px;background:var(--face-plain);box-shadow:inset 0 0 0 1px var(--line);font-size:14px}
 .order li.key{background:var(--face-pm);color:var(--ultra)}
@@ -306,7 +318,7 @@ a{color:inherit}
     <div class="ob-inner">
       <span class="ob-icon" data-icon="page"></span>
       <h1 class="ob-title" id="planTitle">Plan your skincare routine by adding your <em>morning</em> and <em>night</em> routines.</h1>
-      <p class="ob-times">Your everyday products go into every routine. Then add the key products that make each one different.</p>
+      <p class="ob-times">Add the products you use, take a photo of each one, and give it the name on the bottle.</p>
       <div class="plan-list" id="planList"></div>
       <div class="ob-actions">
         <button class="btn btn-primary" id="planAm" type="button">Add a morning routine</button>
@@ -343,8 +355,7 @@ a{color:inherit}
   </section>
 
   <section class="view" data-view="routines" id="v-routines" hidden>
-    <header class="pagehead"><span class="label">What you planned</span><h1>Routines</h1><p>Each routine is your everyday steps plus its key products. You give it a name.</p></header>
-    <div class="rot" id="baseBlock"></div>
+    <header class="pagehead"><span class="label">What you planned</span><h1>Routines</h1><p>Each routine is the products you use, in your order. You give it a name.</p></header>
     <div class="rot" id="rotBlock"></div>
     <div class="rlist" id="rList"></div>
     <button class="btn btn-ghost" id="newRoutine" type="button"><span class="ic" data-icon="plus"></span>New routine</button>
@@ -405,16 +416,27 @@ a{color:inherit}
 <div class="sheet-page" id="rsheet" hidden>
   <form class="sheet" id="rForm" aria-labelledby="rTitle" novalidate>
     <div class="sheet-top"><h2 id="rTitle">New routine</h2><button type="button" class="linkbtn" data-close>Cancel</button></div>
-    <fieldset class="field"><legend>Is this for the morning or the evening?</legend>
+    <fieldset class="field" id="r-tod-field"><legend>Is this for the morning or the evening?</legend>
       <div class="chips" id="r-tod">
         <label><input type="radio" name="tod" value="am" checked><span>Morning</span></label>
         <label><input type="radio" name="tod" value="pm"><span>Evening</span></label>
       </div>
     </fieldset>
-    <fieldset class="field"><legend>Your everyday steps. Untick any you don’t use in this routine.</legend><div class="checks" id="r-base"></div></fieldset>
-    <fieldset class="field"><legend>What’s the key product in this routine? <em>You can pick more than one.</em></legend><div class="chips" id="r-keys"></div></fieldset>
-    <div class="field"><span>Order <em>Use the arrows to move your key products.</em></span><ol class="order" id="r-order"></ol></div>
+    <div class="field"><span>What do you use in this routine?</span>
+      <p class="hint">Add each product in the order you use it. Take a photo and type its name as it’s written on the bottle.</p>
+      <ol class="order" id="r-order"></ol>
+    </div>
+    <div class="field" id="r-shelf-field"><span>Already on your shelf <em>Tap one to add it</em></span><div class="chips" id="r-shelf"></div></div>
+    <div class="field"><span>Add a new product</span>
+      <div class="newprod">
+        <label class="np-photo" for="np-file" id="np-photo" aria-label="Take or choose a photo"></label>
+        <input type="file" id="np-file" accept="image/*" class="sr">
+        <input type="text" id="np-name" autocomplete="off" placeholder="Name on the bottle" aria-label="Product name">
+        <button type="button" class="btn btn-ghost" id="np-add">Add</button>
+      </div>
+    </div>
     <label class="field"><span id="r-name-label">What do you want to call this morning routine?</span><input type="text" id="r-name" autocomplete="off"></label>
+    <div class="more" id="r-more">
     <fieldset class="field"><legend>Tags <em>(optional)</em></legend>
       <div class="chips" id="r-tags">
         <label><input type="checkbox" value="exfoliation"><span>Exfoliation</span></label>
@@ -435,6 +457,7 @@ a{color:inherit}
         <label><input type="checkbox" value="0"><span>Sun</span></label>
       </div>
     </fieldset>
+    </div>
     <p class="err" id="r-err" hidden>Give this routine a name to save it.</p>
     <div class="sheet-actions"><button type="button" class="btn btn-quiet" data-close>Cancel</button><button type="submit" class="btn btn-primary">Save routine</button></div>
   </form>
@@ -488,22 +511,22 @@ const P = {
   azelaic:  { name: 'Azelaic acid', cat: 'Treatment', note: 'The tube with the green cap' },
   balm:     { name: 'Night balm', cat: 'Other' },
 };
-/* everyday steps, set once for mornings and once for evenings. each routine adds its own key products into them. */
-const BASE = { am: ['facewash', 'hydrator', 'merytino', 'spf'], pm: ['facewash', 'hydrator', 'merytino'] };
+/* each routine is the products the person uses, in their order. products that aren't in every routine for that time of day get highlighted: they're what makes the routine different. */
 const R = {
-  arcwell:  { id: 'arcwell',  name: 'Arcwell morning',      tod: 'am', keys: ['arcwell'],  at: 1, skip: [], tags: [] },
-  nimbosin: { id: 'nimbosin', name: 'Nimbosin morning',     tod: 'am', keys: ['nimbosin'], at: 1, skip: [], tags: [] },
-  lactic:   { id: 'lactic',   name: 'Exfoliating evening',  tod: 'pm', keys: ['lactic'],   at: 1, skip: [], tags: ['exfoliation'] },
-  recovery: { id: 'recovery', name: 'Recovery evening',     tod: 'pm', keys: [],           at: 1, skip: [], tags: ['recovery'] },
-  slugging: { id: 'slugging', name: 'Slugging evening',     tod: 'pm', keys: ['balm'],     at: 3, skip: [], tags: ['slugging'] },
-  azelaic:  { id: 'azelaic',  name: 'Azelaic acid evening', tod: 'pm', keys: ['azelaic'],  at: 1, skip: [], tags: [], paused: true },
+  arcwell:  { id: 'arcwell',  name: 'Arcwell morning',      tod: 'am', order: ['facewash', 'arcwell', 'hydrator', 'merytino', 'spf'],  tags: [] },
+  nimbosin: { id: 'nimbosin', name: 'Nimbosin morning',     tod: 'am', order: ['facewash', 'nimbosin', 'hydrator', 'merytino', 'spf'], tags: [] },
+  lactic:   { id: 'lactic',   name: 'Exfoliating evening',  tod: 'pm', order: ['facewash', 'lactic', 'hydrator', 'merytino'],          tags: ['exfoliation'] },
+  recovery: { id: 'recovery', name: 'Recovery evening',     tod: 'pm', order: ['facewash', 'hydrator', 'merytino'],                    tags: ['recovery'] },
+  slugging: { id: 'slugging', name: 'Slugging evening',     tod: 'pm', order: ['facewash', 'hydrator', 'merytino', 'balm'],            tags: ['slugging'] },
+  azelaic:  { id: 'azelaic',  name: 'Azelaic acid evening', tod: 'pm', order: ['facewash', 'azelaic', 'hydrator', 'merytino'],         tags: [], paused: true },
 };
-const stepsOf = r => {
-  if (r.order) return r.order;
-  const b = BASE[r.tod].filter(k => !r.skip.includes(k)), at = Math.min(r.at, b.length);
-  return [...b.slice(0, at), ...r.keys, ...b.slice(at)];
-};
-const prodLine = r => { const s = stepsOf(r); return s.length ? s.map(k => r.keys.includes(k) ? `<b class="kp">${esc(P[k].name)}</b>` : esc(P[k].name)).join(' → ') : 'No products, just a label'; };
+const stepsOf = r => r.order;
+function keysOf(r) {
+  const all = Object.values(R).filter(x => x.tod === r.tod && (!x.paused || x.id === r.id));
+  if (all.length < 2) return [];
+  return r.order.filter(k => !all.every(x => x.order.includes(k)));
+}
+const prodLine = r => { const s = stepsOf(r), keys = keysOf(r); return s.length ? s.map(k => keys.includes(k) ? `<b class="kp">${esc(P[k].name)}</b>` : esc(P[k].name)).join(' → ') : 'No products, just a label'; };
 const TAPE = { exfoliation: 'peach', recovery: 'sage', retinoid: 'lilac', slugging: 'sky' };
 const shelf = ['facewash','hydrator','merytino','spf','arcwell','nimbosin','lactic','azelaic','balm'].map(k => P[k]);
 
@@ -546,9 +569,9 @@ function morph(el, fn) {
 
 /* ---------- sticker markup ---------- */
 function stepsHTML(r) {
-  const s = stepsOf(r);
+  const s = stepsOf(r), keys = keysOf(r);
   if (!s.length) return `<p class="nosteps">No products. This routine is just a label.</p>`;
-  return `<ol class="steps">${s.map((k, i) => `<li${r.keys.includes(k) ? ' class="key"' : ''}><span class="n">${i + 1}</span><span>${esc(P[k].name)}</span></li>`).join('')}</ol>`;
+  return `<ol class="steps">${s.map((k, i) => `<li${keys.includes(k) ? ' class="key"' : ''}><span class="n">${i + 1}</span><span>${esc(P[k].name)}</span></li>`).join('')}</ol>`;
 }
 function tagLine(r) { return r.tags.length ? `<p class="tagline">You tagged this routine as ${joinAnd(r.tags.map(esc))}.</p>` : ''; }
 function tapes(r) { return r.tags.map((t, i) => `<span class="tape t-${TAPE[t] || 'butter'}" style="--rot:${i ? 4 : -5}deg;--top:${-13 + i * 26}px">${esc(t)}</span>`).join(''); }
@@ -790,10 +813,10 @@ function readDraft() { return { name: $('#p-name').value.trim(), cat: ($('input[
 function updatePreview() { const d = readDraft(); $('#pPreview').innerHTML = tile({ ...d, name: d.name || 'Your product' }, 0); }
 function openSheet() { draft = { photo: null }; $('#addForm').reset(); $('#p-paste').textContent = ''; $('#p-err').hidden = true; $('#p-hint').textContent = 'Photos stay on your phone.'; updatePreview(); document.body.classList.add('sheet-open'); $('#sheet').hidden = false; window.scrollTo(0, 0); }
 function closeSheet() { document.body.classList.remove('sheet-open'); $('#sheet').hidden = true; window.scrollTo(0, 0); }
-async function loadPhoto(file) {
-  if (!file || !(file.type || '').startsWith('image/')) { toast('That wasn’t an image. Try a photo or a cut-out.'); return; }
+async function readPhoto(file) {
+  if (!file || !(file.type || '').startsWith('image/')) { toast('That wasn’t an image. Try a photo or a cut-out.'); return null; }
   const url = URL.createObjectURL(file), img = new Image(); img.src = url;
-  try { await img.decode(); } catch (e) { toast('This photo couldn’t be opened. Try another one.'); return; }
+  try { await img.decode(); } catch (e) { toast('This photo couldn’t be opened. Try another one.'); return null; }
   let cut = false;
   try {
     const c = document.createElement('canvas'), s = 48; c.width = c.height = s;
@@ -802,8 +825,12 @@ async function loadPhoto(file) {
     for (let i = 3; i < d.length; i += 4) if (d[i] < 200) t++;
     cut = t / (s * s) > 0.04;
   } catch (e) {}
-  draft.photo = { url, cut };
-  $('#p-hint').textContent = cut ? 'Cut-out found. It’ll show as a die-cut sticker.' : 'It’ll show as a photo sticker. Photos stay on your phone.';
+  return { url, cut };
+}
+async function loadPhoto(file) {
+  const ph = await readPhoto(file); if (!ph) return;
+  draft.photo = ph;
+  $('#p-hint').textContent = ph.cut ? 'Cut-out found. It’ll show as a die-cut sticker.' : 'It’ll show as a photo sticker. Photos stay on your phone.';
   updatePreview();
 }
 $('#addForm').addEventListener('input', e => { if (e.target.id !== 'p-paste') { $('#p-err').hidden = true; updatePreview(); } });
@@ -829,9 +856,6 @@ $('#addForm').addEventListener('submit', e => {
 const SCHED = { arcwell: `Takes turns with ${R.nimbosin.name}`, nimbosin: `Takes turns with ${R.arcwell.name}`, lactic: PM_LABEL, recovery: 'All other evenings', slugging: 'Every Saturday', azelaic: 'Tuesdays, paused for now' };
 let pendingEdit = null;
 function renderRoutines() {
-  $('#baseBlock').innerHTML = `<span class="label">These go into every routine unless you untick them</span><h3>Everyday steps</h3>
-    <p class="rmeta">${ic('sun')}Morning</p><p class="rprods">${BASE.am.map(k => esc(P[k].name)).join(' → ')}</p>
-    <p class="rmeta">${ic('moon')}Evening</p><p class="rprods">${BASE.pm.map(k => esc(P[k].name)).join(' → ')}</p>`;
   const moved = amMovedOn();
   $('#rotBlock').innerHTML = `<span class="label">Mornings that take turns</span><h3>One morning each</h3>
     <div class="seq"><span class="pill${moved ? '' : ' cur'}">${esc(R.arcwell.name)}</span><span class="arrow">then</span><span class="pill${moved ? ' cur' : ''}">${esc(R.nimbosin.name)}</span><span class="arrow">then back again</span></div>
@@ -846,68 +870,76 @@ function renderRoutines() {
   }
 }
 
-/* routine builder: everyday steps + key products, named by the person */
+/* routine builder: the person adds their own products (photo + the name on the bottle), puts them in order and names the routine */
 const todWord = t => t === 'am' ? 'morning' : 'evening';
-let rb = null;
-function rbRender() {
-  const base = BASE[rb.tod];
-  $('#r-base').innerHTML = base.map(k => `<label class="check"><input type="checkbox" value="${k}"${rb.skip.has(k) ? '' : ' checked'}><span>${esc(P[k].name)}</span></label>`).join('');
-  $('#r-keys').innerHTML = Object.keys(P).filter(k => !base.includes(k)).map(k => `<label><input type="checkbox" value="${k}"${rb.keys.includes(k) ? ' checked' : ''}><span>${esc(P[k].name)}</span></label>`).join('');
-  rbOrder();
+const EXAMPLE_NAME = { am: 'Arcwell morning', pm: 'Exfoliating evening' };
+const obProducts = [];
+let rb = null, npPhoto = null, uid = 0;
+const newId = prefix => `${prefix}${Date.now().toString(36)}${uid++}`;
+function thumb(p) {
+  if (p.photo) return `<img class="thumb" src="${p.photo.url}" alt="">`;
+  if (p.art) return `<span class="thumb thumb-art" style="--c:var(--${p.c})">${ART[p.art]}</span>`;
+  return `<span class="thumb thumb-none">${ICON[catIcon(p.cat)]}</span>`;
 }
-function rbOrder() {
+function rbRender() {
+  const plan = rb.from === 'plan';
+  $('#rTitle').textContent = plan ? `Your ${todWord(rb.tod)} routine` : 'New routine';
+  $('#r-tod-field').hidden = plan;
+  $('#r-more').hidden = plan;
+  const source = (plan ? obProducts : Object.keys(P)).filter(k => !rb.order.includes(k));
+  $('#r-shelf-field').hidden = !source.length;
+  $('#r-shelf').innerHTML = source.map(k => `<button type="button" class="addchip" data-add="${k}">${esc(P[k].name)}</button>`).join('');
   $('#r-order').innerHTML = rb.order.length ? rb.order.map((k, i) => {
-    const key = rb.keys.includes(k), nm = esc(P[k].name);
-    return `<li${key ? ' class="key"' : ''}><span class="n">${i + 1}</span><span>${nm}</span>${key ? `<span class="mv"><button type="button" data-mv="-1" data-k="${k}" aria-label="Move ${nm} up">↑</button><button type="button" data-mv="1" data-k="${k}" aria-label="Move ${nm} down">↓</button></span>` : ''}</li>`;
-  }).join('') : '<li class="empty">No products. This routine will just be a label.</li>';
+    const nm = esc(P[k].name);
+    return `<li><span class="n">${i + 1}</span>${thumb(P[k])}<span class="nm">${nm}</span><span class="mv"><button type="button" data-mv="-1" data-k="${k}" aria-label="Move ${nm} up">↑</button><button type="button" data-mv="1" data-k="${k}" aria-label="Move ${nm} down">↓</button><button type="button" data-rm="${k}" aria-label="Remove ${nm}">×</button></span></li>`;
+  }).join('') : '<li class="empty">Nothing added yet.</li>';
   $('#r-name-label').textContent = `What do you want to call this ${todWord(rb.tod)} routine?`;
-  $('#r-name').placeholder = rb.keys.length ? `For example, ${P[rb.keys[0]].name} ${todWord(rb.tod)}` : `For example, My usual ${todWord(rb.tod)}`;
+  $('#r-name').placeholder = `For example, ${EXAMPLE_NAME[rb.tod]}`;
+}
+function resetNewProduct() { npPhoto = null; $('#np-name').value = ''; $('#np-file').value = ''; $('#np-photo').innerHTML = ICON.camera; }
+function addNewProduct() {
+  const name = $('#np-name').value.trim();
+  if (!name) { $('#np-name').focus(); toast('Type the name on the bottle first.'); return; }
+  const id = newId('u');
+  P[id] = { name, cat: '', photo: npPhoto }; shelf.unshift(P[id]);
+  if (rb.from === 'plan') obProducts.push(id);
+  rb.order.push(id); resetNewProduct(); rbRender();
 }
 function openBuilder(tod = 'am', from = 'routines') {
-  rb = { tod, from, skip: new Set(), keys: [], order: [...BASE[tod]] };
-  $('#rForm').reset(); $(`#r-tod input[value="${tod}"]`).checked = true; $('#r-err').hidden = true; rbRender();
+  rb = { tod, from, order: [] };
+  $('#rForm').reset(); $(`#r-tod input[value="${tod}"]`).checked = true; $('#r-err').hidden = true; resetNewProduct(); rbRender();
   document.body.classList.add('sheet-open'); $('#rsheet').hidden = false; window.scrollTo(0, 0);
 }
 function closeBuilder() { document.body.classList.remove('sheet-open'); $('#rsheet').hidden = true; window.scrollTo(0, 0); }
 $('#newRoutine').addEventListener('click', () => openBuilder());
 $$('#rForm [data-close]').forEach(b => b.addEventListener('click', closeBuilder));
-$('#r-tod').addEventListener('change', e => { rb.tod = e.target.value; rb.skip = new Set(); rb.keys = []; rb.order = [...BASE[rb.tod]]; rbRender(); });
-$('#r-base').addEventListener('change', e => {
-  const k = e.target.value;
-  if (e.target.checked) {
-    rb.skip.delete(k);
-    const base = BASE[rb.tod], prev = base.slice(0, base.indexOf(k)).reverse().find(b => rb.order.includes(b));
-    rb.order.splice(prev ? rb.order.indexOf(prev) + 1 : 0, 0, k);
-  } else { rb.skip.add(k); rb.order = rb.order.filter(x => x !== k); }
-  rbOrder();
-});
-$('#r-keys').addEventListener('change', e => {
-  const k = e.target.value;
-  if (e.target.checked) {
-    const lastKey = [...rb.order].reverse().find(x => rb.keys.includes(x));
-    rb.keys.push(k);
-    rb.order.splice(lastKey ? rb.order.indexOf(lastKey) + 1 : Math.min(1, rb.order.length), 0, k);
-  } else { rb.keys = rb.keys.filter(x => x !== k); rb.order = rb.order.filter(x => x !== k); }
-  rbOrder();
-});
+$('#r-tod').addEventListener('change', e => { rb.tod = e.target.value; rbRender(); });
+$('#r-shelf').addEventListener('click', e => { const b = e.target.closest('[data-add]'); if (!b) return; rb.order.push(b.dataset.add); rbRender(); });
+$('#np-add').addEventListener('click', addNewProduct);
+$('#np-name').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addNewProduct(); } });
+$('#np-file').addEventListener('change', async e => { const ph = await readPhoto(e.target.files[0]); if (!ph) return; npPhoto = ph; $('#np-photo').innerHTML = `<img src="${ph.url}" alt="">`; $('#np-name').focus(); });
 $('#r-order').addEventListener('click', e => {
+  const rm = e.target.closest('[data-rm]');
+  if (rm) { rb.order = rb.order.filter(x => x !== rm.dataset.rm); rbRender(); return; }
   const b = e.target.closest('[data-mv]'); if (!b) return;
   const k = b.dataset.k, i = rb.order.indexOf(k), j = i + Number(b.dataset.mv);
   if (j < 0 || j >= rb.order.length) return;
   [rb.order[i], rb.order[j]] = [rb.order[j], rb.order[i]];
-  rbOrder();
+  rbRender();
   const again = $(`#r-order [data-k="${k}"][data-mv="${b.dataset.mv}"]`); if (again) again.focus();
 });
 $('#r-name').addEventListener('input', () => { $('#r-err').hidden = true; });
 $('#rForm').addEventListener('submit', e => {
   e.preventDefault();
+  if ($('#np-name').value.trim()) addNewProduct();
   const name = $('#r-name').value.trim();
   if (!name) { $('#r-err').hidden = false; $('#r-name').focus(); return; }
-  const tags = $$('#r-tags input:checked').map(i => i.value), own = $('#r-tag-own').value.trim();
+  const plan = rb.from === 'plan';
+  const tags = plan ? [] : $$('#r-tags input:checked').map(i => i.value), own = plan ? '' : $('#r-tag-own').value.trim();
   if (own) tags.push(own);
-  const days = $$('#r-days input:checked').map(i => Number(i.value)), id = 'r' + Date.now();
-  R[id] = { id, name, tod: rb.tod, keys: [...rb.keys], order: [...rb.order], skip: [...rb.skip], tags };
-  SCHED[id] = days.length === 7 ? 'Every day' : days.length ? `Every ${joinAnd(monFirst(days).map(d => WD[d]))}` : 'Not scheduled yet';
+  const days = plan ? [] : $$('#r-days input:checked').map(i => Number(i.value)), id = newId('r');
+  R[id] = { id, name, tod: rb.tod, order: [...rb.order], tags };
+  SCHED[id] = plan ? `Every ${todWord(rb.tod)}` : days.length === 7 ? 'Every day' : days.length ? `Every ${joinAnd(monFirst(days).map(d => WD[d]))}` : 'Not scheduled yet';
   const from = rb.from;
   closeBuilder();
   if (from === 'plan') { planned.push(id); renderPlan(); }
@@ -996,7 +1028,7 @@ function closeOnboard() {
   if (location.hash === '' || location.hash === '#today') setTimeout(tease, 650);
 }
 function renderPlan() {
-  $('#planList').innerHTML = planned.map(id => `<p class="plan-row">${ic(R[id].tod === 'am' ? 'sun' : 'moon')}<span>${esc(R[id].name)}</span>${ic('check', 'ok')}</p>`).join('');
+  $('#planList').innerHTML = planned.map(id => `<p class="plan-row">${ic(R[id].tod === 'am' ? 'sun' : 'moon')}<span>${esc(R[id].name)}, ${R[id].order.length} product${R[id].order.length === 1 ? '' : 's'}</span>${ic('check', 'ok')}</p>`).join('');
   $('#planDone').textContent = planned.length ? 'I’m done, show me my day' : 'Skip for now';
   $('#planDone').className = planned.length ? 'btn btn-primary' : 'btn btn-quiet';
   $('#planAm').className = planned.length ? 'btn btn-ghost' : 'btn btn-primary';
@@ -1017,6 +1049,7 @@ function show(v) {
   if (v === 'history') renderHistory();
   if (v === 'notifications') renderNotes();
   if (v === 'routines') renderRoutines();
+  if (v === 'shelf') renderShelf();
   if (!pendingEdit) window.scrollTo(0, 0);
 }
 window.addEventListener('hashchange', () => show(location.hash.slice(1)));
