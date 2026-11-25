@@ -15,7 +15,7 @@
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Reminders"] }],
   "vars": {
     // Push services ask who sends the reminders. This is the app's own address.
-    "PUSH_CONTACT": "https://my-skin-routine.trymargin.workers.dev"
+    "PUSH_CONTACT": "https://my-skin-routine.pages.dev"
   },
   "observability": { "enabled": true }
 }
