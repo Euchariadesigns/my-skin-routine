@@ -233,6 +233,16 @@ a{color:inherit}
 .ob-top .t{margin-left:auto;color:var(--ink-faint);font-size:12px}
 .ob-panel{margin-top:10px;background:var(--face-pm);border-radius:18px;padding:16px;min-height:104px;color:var(--ultra);display:flex;flex-direction:column;gap:8px;font-size:13px}
 .ob-panel .rn{font-family:var(--font-display);font-size:28px;line-height:1.05;color:var(--ink)}
+.ob-stack{list-style:none;margin:4px 0 0;padding:0;display:flex;flex-direction:column;gap:4px}
+.ob-stack li{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--ink)}
+.ob-stack .n{font-size:11px;color:var(--ultra);min-width:1em}
+.ob-thumb{width:44px;height:50px;flex:none;display:inline-flex;align-items:center;justify-content:center;transform:rotate(var(--r,0deg))}
+.ob-thumb .art svg{height:44px;filter:drop-shadow(2px 0 0 var(--edge)) drop-shadow(-2px 0 0 var(--edge)) drop-shadow(0 2px 0 var(--edge)) drop-shadow(0 -2px 0 var(--edge)) drop-shadow(0 3px 3px var(--shadow-soft))}
+.ob-thumb .noart{width:38px;height:38px}
+.ob-thumb .noart svg{width:18px;height:18px}
+.ob-yday{display:flex;align-items:center;gap:8px;margin-top:6px;padding-top:10px;border-top:1px dashed var(--line);font-size:12px;color:var(--ink-soft)}
+.ob-yday .ic{width:16px;height:16px;color:var(--ultra)}
+.ob-why{font-size:14px;line-height:1.55;color:var(--ink);text-align:center;max-width:34ch}
 .ob-times{font-size:13px;color:var(--ink-soft);text-align:center;max-width:34ch}
 .ob-actions{margin-top:4px;width:100%;display:flex;flex-direction:column;gap:6px}
 .ob-actions .btn{min-height:52px;font-size:15px;border-radius:16px}
@@ -300,17 +310,17 @@ a{color:inherit}
 <div class="app">
   <section class="onboard" id="onboard" aria-labelledby="obTitle" hidden>
     <div class="ob-inner">
-      <span class="ob-icon" data-icon="bell"></span>
-      <h1 class="ob-title" id="obTitle">Want a <em>reminder</em> for your morning and night routines?</h1>
-      <div class="ob-card" aria-hidden="true">
-        <div class="ob-top"><span class="ic" data-icon="moon"></span><span id="obDate"></span><span class="t">9:00 pm</span></div>
-        <div class="ob-panel"><span>Tonight</span><span class="rn">Exfoliating evening</span><span id="obSteps"></span></div>
+      <h1 class="ob-title" id="obTitle">No more guessing which products you used <em>yesterday</em>.</h1>
+      <div class="ob-card" role="img" aria-label="An example of a morning routine with each product pictured in order">
+        <div class="ob-top"><span class="ic" data-icon="sun"></span><span>This morning</span><span class="t" id="obDate"></span></div>
+        <div class="ob-panel"><span class="rn" id="obName"></span><ol class="ob-stack" id="obStack"></ol><p class="ob-yday" id="obYday"></p></div>
       </div>
+      <p class="ob-why">Add your morning and night routines once. Each day, the app shows you what’s next and reminds you when it’s time.</p>
       <div class="ob-actions">
         <button class="btn btn-primary" id="obYes" type="button">Send me reminders</button>
         <button class="btn btn-quiet" id="obNo" type="button">Not now</button>
       </div>
-      <p class="ob-times">We’ll remind you at 7:30 am and 9:00 pm. You can change the times anytime.</p>
+      <p class="ob-times">Reminders come at 7:30 am and 9:00 pm. You can change the times anytime.</p>
     </div>
   </section>
 
@@ -504,7 +514,7 @@ const P = {
   facewash: { name: 'Face wash', cat: 'Cleanser', art: 'pump', c: 'sky' },
   hydrator: { name: 'Hydrator', cat: 'Hydrator', art: 'bottle', c: 'peach' },
   merytino: { name: 'Merytino', cat: 'Moisturizer', art: 'jar', c: 'blush' },
-  spf:      { name: 'Sunscreen', cat: 'Sunscreen' },
+  spf:      { name: 'Sunscreen', cat: 'Sunscreen', art: 'tube', c: 'butter' },
   arcwell:  { name: 'Arcwell', cat: 'Treatment', art: 'dropper', c: 'butter' },
   nimbosin: { name: 'Nimbosin', cat: 'Treatment', art: 'tube', c: 'lilac' },
   lactic:   { name: 'Lactic acid', cat: 'Treatment', art: 'bottle', c: 'sage' },
@@ -1021,7 +1031,10 @@ function renderBadge() { const c = notes.filter(n => n.unread).length, b = $('#b
 /* ---------- first-time screens: reminders, then planning ---------- */
 let obFrom = 'start';
 const planned = [];
-function openOnboard(from = 'start') { obFrom = from; document.body.classList.add('ob-open'); $('#plan').hidden = true; $('#onboard').hidden = false; window.scrollTo(0, 0); }
+function openOnboard(from = 'start') {
+  obFrom = from; document.body.classList.add('ob-open'); $('#plan').hidden = true; $('#onboard').hidden = false; window.scrollTo(0, 0);
+  if (!RM) $$('#obStack li').forEach((li, i) => li.animate([{ opacity: 0, transform: 'translateY(-10px) scale(1.06)' }, { opacity: 1, transform: 'none' }], { duration: 420, delay: 250 + i * 110, easing: 'cubic-bezier(.2,.9,.3,1.2)', fill: 'backwards' }));
+}
 function showPlan() { $('#onboard').hidden = true; $('#plan').hidden = false; renderPlan(); window.scrollTo(0, 0); }
 function closeOnboard() {
   document.body.classList.remove('ob-open'); $('#onboard').hidden = true; $('#plan').hidden = true; window.scrollTo(0, 0);
@@ -1069,8 +1082,13 @@ $('#greet').innerHTML = `Hi Eucharia,<br>here’s your skincare routine for ${hr
 $('#dNum').textContent = TODAY.getDate();
 $('#dWk').textContent = WD[TODAY.getDay()];
 $('#dMo').textContent = `${MO[TODAY.getMonth()]} ${TODAY.getFullYear()}`;
-$('#obDate').textContent = `${WD[TODAY.getDay()]}, ${TODAY.getDate()} ${MO[TODAY.getMonth()].slice(0, 3)}`;
-$('#obSteps').textContent = stepsOf(R.lactic).map(k => P[k].name).join(' → ');
+$('#obDate').textContent = `${WD[TODAY.getDay()].slice(0, 3)} ${TODAY.getDate()} ${MO[TODAY.getMonth()].slice(0, 3)}`;
+$('#obName').textContent = R.arcwell.name;
+$('#obStack').innerHTML = stepsOf(R.arcwell).map((k, i) => {
+  const p = P[k], pic = p.art ? `<span class="art" style="--c:var(--${p.c})">${ART[p.art]}</span>` : `<span class="noart">${ICON[catIcon(p.cat)]}</span>`;
+  return `<li><span class="n">${i + 1}</span><span class="ob-thumb" style="--r:${[-7, 5, -3, 8, -5][i % 5]}deg">${pic}</span><span>${esc(p.name)}</span></li>`;
+}).join('');
+$('#obYday').innerHTML = `${ic('check')}<span>Yesterday you used ${esc(logsFor(1)[0].r.name)}.</span>`;
 renderAM(); renderPM(); renderNext(); renderShelf(); renderBadge();
 show(location.hash.slice(1));
 if (!location.hash) openOnboard('start');
