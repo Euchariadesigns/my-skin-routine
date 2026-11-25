@@ -222,9 +222,10 @@ a{color:inherit}
 .toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translate(-50%,16px);opacity:0;width:max-content;max-width:min(360px,calc(100% - 32px));background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:14px;font-size:13px;z-index:90;transition:opacity .25s,transform .25s;pointer-events:none}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 
-/* onboarding */
-.onboard{position:fixed;inset:0;z-index:80;background:var(--paper);overflow-y:auto;padding:calc(40px + env(safe-area-inset-top,0px)) max(24px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(24px,env(safe-area-inset-left,0px))}
-.ob-inner{min-height:100%;max-width:380px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:30px}
+/* onboarding: a normal first screen in the page flow, so its buttons sit right under the content and the page scrolls in any viewer */
+.ob-open .view,.ob-open .tabbar{display:none!important}
+.onboard{padding-top:12px}
+.ob-inner{max-width:380px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:22px}
 .ob-icon{width:54px;height:54px;color:var(--ultra)}
 .ob-icon svg{width:100%;height:100%;stroke-width:1.6}
 .ob-title{font-family:var(--font-mono);font-weight:400;font-size:21px;line-height:1.35;text-align:center;letter-spacing:-.01em}
@@ -233,10 +234,10 @@ a{color:inherit}
 .ob-top{display:flex;align-items:center;gap:8px;color:var(--ultra);font-size:13px;padding:2px 4px}
 .ob-top .ic{width:20px;height:20px}
 .ob-top .t{margin-left:auto;color:var(--ink-faint);font-size:12px}
-.ob-panel{margin-top:10px;background:var(--face-pm);border-radius:18px;padding:16px;min-height:150px;color:var(--ultra);display:flex;flex-direction:column;gap:8px;font-size:13px}
+.ob-panel{margin-top:10px;background:var(--face-pm);border-radius:18px;padding:16px;min-height:104px;color:var(--ultra);display:flex;flex-direction:column;gap:8px;font-size:13px}
 .ob-panel .rn{font-family:var(--font-display);font-size:28px;line-height:1.05;color:var(--ink)}
 .ob-times{font-size:12px;color:var(--ink-soft);text-align:center;max-width:30ch}
-.ob-actions{margin-top:auto;width:100%;display:flex;flex-direction:column;gap:4px}
+.ob-actions{margin-top:4px;width:100%;display:flex;flex-direction:column;gap:4px}
 .ob-actions .btn-primary{min-height:56px;font-size:16px;border-radius:16px}
 
 /* add product sheet */
@@ -271,6 +272,22 @@ a{color:inherit}
 </style>
 
 <div class="app">
+  <section class="onboard" id="onboard" aria-labelledby="obTitle" hidden>
+    <div class="ob-inner">
+      <span class="ob-icon" data-icon="bell"></span>
+      <h1 class="ob-title" id="obTitle">plan your skin days.<br>want a <em>reminder</em><br>morning and night?</h1>
+      <div class="ob-card" aria-hidden="true">
+        <div class="ob-top"><span class="ic" data-icon="moon"></span><span id="obDate"></span><span class="t">9:00 pm</span></div>
+        <div class="ob-panel"><span>tonight</span><span class="rn">Lactic acid night</span><span id="obSteps"></span></div>
+      </div>
+      <div class="ob-actions">
+        <button class="btn btn-primary" id="obYes" type="button">send me reminders</button>
+        <button class="btn btn-quiet" id="obNo" type="button">not now</button>
+      </div>
+      <p class="ob-times">reminders come at 7:30 am and 9:00 pm. you can change the times anytime.</p>
+    </div>
+  </section>
+
   <section class="view" data-view="today" id="v-today">
     <header class="hello">
       <span class="preview-chip">design preview · example data</span>
@@ -324,21 +341,6 @@ a{color:inherit}
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<div class="onboard" id="onboard" role="dialog" aria-modal="true" aria-labelledby="obTitle" hidden>
-  <div class="ob-inner">
-    <span class="ob-icon" data-icon="bell"></span>
-    <h1 class="ob-title" id="obTitle">plan your skin days.<br>want a <em>reminder</em><br>morning and night?</h1>
-    <div class="ob-card" aria-hidden="true">
-      <div class="ob-top"><span class="ic" data-icon="moon"></span><span id="obDate"></span><span class="t">9:00 pm</span></div>
-      <div class="ob-panel"><span>tonight</span><span class="rn">Lactic acid night</span><span id="obSteps"></span></div>
-    </div>
-    <p class="ob-times">reminders come at 7:30 am and 9:00 pm. you can change the times anytime.</p>
-    <div class="ob-actions">
-      <button class="btn btn-primary" id="obYes" type="button">send me reminders</button>
-      <button class="btn btn-quiet" id="obNo" type="button">not now</button>
-    </div>
-  </div>
-</div>
 
 <div class="sheet-backdrop" id="sheet" hidden>
   <form class="sheet" id="addForm" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" novalidate>
@@ -805,8 +807,8 @@ function renderBadgeAndLists() {
 }
 
 /* ---------- onboarding ---------- */
-function openOnboard() { $('#onboard').hidden = false; }
-function closeOnboard() { $('#onboard').hidden = true; if (location.hash === '' || location.hash === '#today') setTimeout(tease, 650); }
+function openOnboard() { document.body.classList.add('ob-open'); $('#onboard').hidden = false; window.scrollTo(0, 0); }
+function closeOnboard() { document.body.classList.remove('ob-open'); $('#onboard').hidden = true; window.scrollTo(0, 0); if (location.hash === '' || location.hash === '#today') setTimeout(tease, 650); }
 $('#obYes').addEventListener('click', () => { state.push = true; closeOnboard(); renderNotes(); toast('in the app, your phone asks to allow notifications here.'); });
 $('#obNo').addEventListener('click', () => { closeOnboard(); toast('in-app reminders stay on. turn on phone reminders anytime.'); });
 
@@ -848,7 +850,7 @@ if (!location.hash) openOnboard();
 try {
   const q = new URLSearchParams(location.search);
   if (q.has('peel')) {
-    $('#onboard').hidden = true;
+    document.body.classList.remove('ob-open'); $('#onboard').hidden = true;
     setTimeout(() => {
       const st = $('#slot-am .stage'); st.classList.add('peeling'); dims(st);
       const t = parseFloat(q.get('peel')), u = 1 - t, a = rest(st), c = peelCtrl(st), b = peelEnd(st);
