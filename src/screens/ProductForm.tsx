@@ -110,7 +110,7 @@ function ProductFormInner({ product }: { product?: Product }) {
           <input type="text" autoComplete="off" placeholder="For example, the tube with the green cap" value={note} onChange={e => setNote(e.target.value)} />
         </label>
         {err && <p className="err" role="alert">{err}</p>}
-        <div className="form-actions">
+        <div className="form-actions pinned">
           <button type="submit" className="btn btn-primary">{product ? 'Save changes' : 'Add to shelf'}</button>
         </div>
         {product && (

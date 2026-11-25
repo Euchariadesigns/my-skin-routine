@@ -299,7 +299,7 @@ function BuilderForm({ from, initialTod, editing, products, routines, schedules,
         )}
 
         {err && <p className="err" role="alert">{err}</p>}
-        <div className="form-actions">
+        <div className="form-actions pinned">
           <button type="submit" className="btn btn-primary" disabled={busy}>Save routine</button>
         </div>
 
