@@ -9,7 +9,7 @@ A web app you install on your phone. It helps you remember which skincare routin
 
 The app only shows your own plan back to you. It doesn't recommend products, judge ingredients, or give skincare advice.
 
-**Live:** https://my-skin-routine.trymargin.workers.dev
+**Live:** https://my-skin-routine.pages.dev
 
 **Status:** in progress.
 
@@ -38,6 +38,9 @@ The VAPID keys are made by the Durable Object the first time they're needed and 
 
 ## Deploying
 
-The app is served by Cloudflare Workers: static files from `dist/`, plus the reminder server in `worker/` (see `wrangler.jsonc`). With the GitHub repo connected to Cloudflare Workers Builds, every push to `main` builds with `npm run build` and deploys with `npx wrangler deploy`.
+Two Cloudflare projects build from this repo on every push to `main`:
 
-People install it from the browser: on iPhone, open it in Safari and tap Share, then Add to Home Screen; on Android, Chrome offers to install it.
+- **Pages project `my-skin-routine`** serves the app at https://my-skin-routine.pages.dev (build `npm run build`, output `dist`). `functions/api/[[path]].ts` passes `/api/*` calls to the reminder server through a service binding named `API`, set in the Pages project's settings.
+- **Worker `my-skin-routine`** is the reminder server (`worker/`, configured in `wrangler.jsonc`), deployed by Workers Builds with `npx wrangler deploy`. It has no public address of its own.
+
+People install the app from the browser: on iPhone, open it in Safari and tap Share, then Add to Home Screen; on Android, Chrome offers to install it.

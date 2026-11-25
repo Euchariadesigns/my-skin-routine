@@ -1,14 +1,13 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "my-skin-routine",
-  // The reminder server. Everything outside /api/ is served straight from ./dist.
+  // The reminder server. The app itself is served by Cloudflare Pages at my-skin-routine.pages.dev,
+  // which passes /api/* calls here through a service binding (see functions/api/[[path]].ts).
   "main": "worker/index.ts",
   "compatibility_date": "2026-10-01",
-  "assets": {
-    "directory": "./dist",
-    "not_found_handling": "single-page-application",
-    "run_worker_first": ["/api/*"]
-  },
+  // No public workers.dev address: only the Pages app can reach this Worker.
+  "workers_dev": false,
+  "preview_urls": false,
   "durable_objects": {
     "bindings": [{ "name": "REMINDERS", "class_name": "Reminders" }]
   },
