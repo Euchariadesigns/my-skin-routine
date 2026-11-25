@@ -179,7 +179,7 @@ function BuilderForm({ from, initialTod, editing, products, routines, schedules,
       <form className="form" onSubmit={save} noValidate aria-labelledby="builder-title">
         <div className="form-top">
           <h1 id="builder-title">{title}</h1>
-          <button type="button" className="linkbtn" onClick={cancel}>Cancel</button>
+          <button type="button" className="iconbtn" onClick={cancel} aria-label="Close"><Icon name="close" /></button>
         </div>
 
         {!plan && (
@@ -300,7 +300,6 @@ function BuilderForm({ from, initialTod, editing, products, routines, schedules,
 
         {err && <p className="err" role="alert">{err}</p>}
         <div className="form-actions">
-          <button type="button" className="btn btn-quiet" onClick={cancel}>Cancel</button>
           <button type="submit" className="btn btn-primary" disabled={busy}>Save routine</button>
         </div>
 

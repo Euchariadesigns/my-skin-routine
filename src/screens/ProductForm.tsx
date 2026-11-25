@@ -72,7 +72,7 @@ function ProductFormInner({ product }: { product?: Product }) {
       <form className="form" onSubmit={save} noValidate aria-labelledby="product-title">
         <div className="form-top">
           <h1 id="product-title">{product ? 'Edit product' : 'Add a product'}</h1>
-          <button type="button" className="linkbtn" onClick={() => navigate('/shelf')}>Cancel</button>
+          <button type="button" className="iconbtn" onClick={() => navigate('/shelf')} aria-label="Close"><Icon name="close" /></button>
         </div>
         <div className="tile" style={{ width: 190, alignSelf: 'center', cursor: 'default' }}>
           <div className="tile-art"><ProductPic product={draft} size={110} /></div>
@@ -111,7 +111,6 @@ function ProductFormInner({ product }: { product?: Product }) {
         </label>
         {err && <p className="err" role="alert">{err}</p>}
         <div className="form-actions">
-          <button type="button" className="btn btn-quiet" onClick={() => navigate('/shelf')}>Cancel</button>
           <button type="submit" className="btn btn-primary">{product ? 'Save changes' : 'Add to shelf'}</button>
         </div>
         {product && (

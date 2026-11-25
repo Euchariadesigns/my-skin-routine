@@ -42,10 +42,10 @@ export function Welcome() {
             </div>
           </div>
           <p className="ob-why">Add your morning and night routines once. Each day, we’ll show you what’s next and remind you when it’s time.</p>
-          {isIOS() && !isInstalled() && (
-            <p className="notice">Using an iPhone? Add us to your Home Screen first: tap the Share button, then “Add to Home Screen”, and open us from there. That way your routines and reminders stay together.</p>
-          )}
           <div className="ob-actions">
+            {isIOS() && !isInstalled() && (
+              <p className="ob-hint">On iPhone, add us to your Home Screen first so your routines and reminders stay together. Tap Share, then “Add to Home Screen”.</p>
+            )}
             <button className="btn btn-primary" type="button" onClick={() => navigate('/plan')}>Add my products</button>
           </div>
         </div>

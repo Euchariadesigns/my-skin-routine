@@ -14,6 +14,7 @@ const PATHS = {
   sliders: 'M5 7.2h9M18 7.2h1M5 12.1h3M12 12h7M5 16.9h11M19.4 16.9h-.4M15.9 5.4v3.6M9.9 10.3v3.6M17.6 15.1v3.6',
   left: 'M14.5 6.5L9 12l5.5 5.5',
   right: 'M9.5 6.5L15 12l-5.5 5.5',
+  close: 'M7 7.2c3.4 3.1 6.7 6.4 9.9 9.7M16.9 7.1c-3.3 3.2-6.6 6.5-9.8 9.8',
 }
 
 export type IconName = keyof typeof PATHS
