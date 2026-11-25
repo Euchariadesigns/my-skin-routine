@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router'
 import { Icon } from '../../components/Icon'
 import { ProductPic } from '../../components/ProductPic'
 import { useToast } from '../../components/Toast'
-import { askForPersistentStorage, updateSettings } from '../../db/db'
+import { updateSettings } from '../../db/db'
 import { fmtClock } from '../../domain/dates'
 import { useProducts, useRoutines, useSettings } from '../../hooks/data'
-import { askForPhoneReminders, phoneReminderSupport, SUPPORT_MESSAGE } from '../../lib/notify'
+import { phoneReminderSupport, SUPPORT_MESSAGE } from '../../lib/notify'
+import { turnOnPhoneReminders } from '../../lib/push'
+import { askForPersistentStorage } from '../../lib/storage'
 import { STACK_TILTS } from './Welcome'
 
 export function RemindersAsk() {
@@ -32,7 +34,7 @@ export function RemindersAsk() {
   const yes = async () => {
     const support = phoneReminderSupport()
     if (support !== 'ok') return setNotice(SUPPORT_MESSAGE[support])
-    const granted = await askForPhoneReminders()
+    const granted = await turnOnPhoneReminders()
     toast(granted ? `Reminders are on. We’ll remind you at ${times}.` : 'Phone reminders are off. We’ll still remind you inside the app.')
     await finish(granted)
   }

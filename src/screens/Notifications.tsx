@@ -3,10 +3,11 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { Icon } from '../components/Icon'
 import { useToast } from '../components/Toast'
-import { db, updateSettings } from '../db/db'
+import { db } from '../db/db'
 import { dayLabel, fmtClock, fmtTime } from '../domain/dates'
 import { useSettings, useToday } from '../hooks/data'
-import { askForPhoneReminders, phoneReminderSupport, SUPPORT_MESSAGE } from '../lib/notify'
+import { phoneReminderSupport, SUPPORT_MESSAGE } from '../lib/notify'
+import { sendTestReminder, turnOnPhoneReminders } from '../lib/push'
 
 export function Notifications() {
   const navigate = useNavigate()
@@ -15,15 +16,25 @@ export function Notifications() {
   const settings = useSettings()
   const notes = useLiveQuery(() => db.notifications.orderBy('createdAt').reverse().toArray(), [])
   const [notice, setNotice] = useState<string>()
+  const [testing, setTesting] = useState(false)
   if (!settings || !notes) return null
 
   const unread = notes.filter(n => !n.read)
   const turnOn = async () => {
     const support = phoneReminderSupport()
     if (support !== 'ok') return setNotice(SUPPORT_MESSAGE[support])
-    const granted = await askForPhoneReminders()
-    await updateSettings({ pushOn: granted })
+    const granted = await turnOnPhoneReminders()
     toast(granted ? 'Phone reminders are on.' : 'Phone reminders are still off. We’ll keep reminding you here.')
+  }
+  const test = async () => {
+    setTesting(true)
+    const result = await sendTestReminder()
+    setTesting(false)
+    toast(
+      result === 'sent' ? 'Sent. It should show up on your phone in a few seconds.'
+        : result === 'wait' ? 'We just sent one. Give it a few seconds.'
+          : 'We couldn’t send it. Check that you’re online, then try again.',
+    )
   }
 
   return (
@@ -37,6 +48,9 @@ export function Notifications() {
         <div className="remrow"><span>Phone reminders</span><span>{settings.pushOn ? 'On' : 'Not turned on yet'}</span></div>
         {notice && <p className="notice">{notice}</p>}
         {!settings.pushOn && !notice && <button className="btn btn-primary" type="button" onClick={turnOn}>Turn on phone reminders</button>}
+        {settings.pushOn && settings.remindersOn && (
+          <button className="btn btn-ghost" type="button" onClick={test} disabled={testing}>{testing ? 'Sending…' : 'Send me a test reminder'}</button>
+        )}
         <Link className="linkbtn" to="/settings" style={{ alignSelf: 'flex-start', paddingLeft: 0 }}>Change reminder times</Link>
       </div>
 

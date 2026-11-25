@@ -1,7 +1,9 @@
 import { db, getSettings, uid } from '../db/db'
 import { showPhoneNotification } from '../lib/notify'
+import { serverRemindersOn } from '../lib/push'
 import { ALL_DAYS, dateKey, minutesOf } from './dates'
-import { entriesForDate, rotationAfterLog, type Entry, type PlanData } from './schedule'
+import { recordReminder, reminderBody, reminderTitle } from './reminders'
+import { rotationAfterLog, type Entry } from './schedule'
 import type { LogStatus, Product, Rotation, Routine, RoutineLog, Tod } from './types'
 
 /* ---------------- logging ---------------- */
@@ -166,26 +168,18 @@ export async function setScheduleActive(scheduleId: string, active: boolean): Pr
   await db.schedules.update(scheduleId, { active })
 }
 
-/* ---------------- reading plan data ---------------- */
-
-export async function loadPlanData(dates: string[]): Promise<PlanData> {
-  const [schedules, routines, rotations, logs] = await Promise.all([
-    db.schedules.toArray(), db.routines.toArray(), db.rotations.toArray(),
-    db.logs.where('date').anyOf(dates).toArray(),
-  ])
-  return { schedules, routines, rotations, logs }
-}
-
 /* ---------------- in-app reminders ---------------- */
 
-/** Creates today's morning and evening reminders once their time has passed. No reminder when nothing is due. */
+/**
+ * While the app is open: adds today's morning and evening reminders once their time has passed.
+ * No reminder when nothing is due. When our reminder server is set up for this phone, it sends the
+ * phone notification, so we don't send a second one.
+ */
 export async function generateDueNotifications(now = new Date()): Promise<void> {
   const s = await getSettings()
   if (!s.remindersOn || !s.onboarded) return
   const date = dateKey(now)
   const minutes = now.getHours() * 60 + now.getMinutes()
-  const plan = await loadPlanData([date])
-  const products = new Map((await db.products.toArray()).map(p => [p.id, p]))
   for (const tod of ['am', 'pm'] as const) {
     const time = tod === 'am' ? s.morningTime : s.eveningTime
     if (minutes < minutesOf(time)) continue
@@ -194,20 +188,9 @@ export async function generateDueNotifications(now = new Date()): Promise<void> 
     if (s.onboardedAt && dueAt.getTime() < s.onboardedAt) continue
     const id = `${date}-${tod}`
     if (await db.notifications.get(id)) continue
-    const due = entriesForDate(date, plan).filter(e => e.tod === tod && e.status === 'planned')
-    if (!due.length) continue
-    const items = due.map(e => ({
-      routineName: e.name,
-      productNames: (e.routine?.productIds ?? []).map(pid => products.get(pid)?.name).filter((n): n is string => !!n),
-    }))
-    await db.notifications.put({ id, date, tod, time, createdAt: Date.now(), read: false, items })
-    if (s.pushOn) {
-      await showPhoneNotification(
-        tod === 'am' ? 'Time for your morning routine' : 'Time for your evening routine',
-        items.map(i => (i.productNames.length ? `${i.routineName}: ${i.productNames.join(' → ')}` : i.routineName)).join('\n'),
-        '/',
-        id,
-      )
+    const items = await recordReminder(date, tod, time)
+    if (items && s.pushOn && !serverRemindersOn()) {
+      await showPhoneNotification(reminderTitle(tod), reminderBody(items), '/', id)
     }
   }
 }

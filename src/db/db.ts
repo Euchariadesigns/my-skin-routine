@@ -1,4 +1,5 @@
 import Dexie, { type EntityTable } from 'dexie'
+import type { PlanData } from '../domain/schedule'
 import type { AppNotification, Product, Rotation, Routine, RoutineLog, Schedule, Settings } from '../domain/types'
 
 /** Everything lives on the person's phone, in IndexedDB. */
@@ -42,9 +43,11 @@ export async function updateSettings(patch: Partial<Omit<Settings, 'id'>>): Prom
   await db.settings.put({ ...current, ...patch, id: 'me' })
 }
 
-/** Ask the browser to keep our data even when the phone is low on space. */
-export async function askForPersistentStorage(): Promise<void> {
-  try {
-    if (navigator.storage?.persist && !(await navigator.storage.persisted())) await navigator.storage.persist()
-  } catch { /* not supported; nothing to do */ }
+/** Everything needed to work out what's planned on these dates. */
+export async function loadPlanData(dates: string[]): Promise<PlanData> {
+  const [schedules, routines, rotations, logs] = await Promise.all([
+    db.schedules.toArray(), db.routines.toArray(), db.rotations.toArray(),
+    db.logs.where('date').anyOf(dates).toArray(),
+  ])
+  return { schedules, routines, rotations, logs }
 }

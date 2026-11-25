@@ -5,7 +5,8 @@ import { updateSettings } from '../db/db'
 import type { Settings } from '../domain/types'
 import { useSettings } from '../hooks/data'
 import { backupFileName, eraseEverything, exportBackup, importBackup } from '../lib/backup'
-import { askForPhoneReminders, phoneReminderSupport, SUPPORT_MESSAGE } from '../lib/notify'
+import { phoneReminderSupport, SUPPORT_MESSAGE } from '../lib/notify'
+import { turnOffPhoneReminders, turnOnPhoneReminders } from '../lib/push'
 
 export function SettingsScreen() {
   const settings = useSettings()
@@ -34,9 +35,13 @@ function SettingsForm({ settings }: { settings: Settings }) {
   const turnOnPhone = async () => {
     const support = phoneReminderSupport()
     if (support !== 'ok') return setNotice(SUPPORT_MESSAGE[support])
-    const granted = await askForPhoneReminders()
-    await updateSettings({ pushOn: granted })
+    const granted = await turnOnPhoneReminders()
     toast(granted ? 'Phone reminders are on.' : 'Phone reminders are still off.')
+  }
+
+  const turnOffPhone = async () => {
+    await turnOffPhoneReminders()
+    toast('Phone reminders are off. We’ll still remind you inside the app.')
   }
 
   const download = async () => {
@@ -110,6 +115,7 @@ function SettingsForm({ settings }: { settings: Settings }) {
           <p>{settings.pushOn ? 'On. We’ll also remind you with a phone notification.' : 'Off. We’ll remind you inside the app.'}</p>
           {notice && <p className="notice">{notice}</p>}
           {!settings.pushOn && !notice && <button type="button" className="btn btn-ghost" onClick={turnOnPhone}>Turn on phone reminders</button>}
+          {settings.pushOn && <button type="button" className="linkbtn" style={{ alignSelf: 'flex-start', paddingLeft: 0 }} onClick={turnOffPhone}>Turn off phone reminders</button>}
         </div>
 
         <div className="card">

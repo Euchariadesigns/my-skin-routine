@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "npm run types && tsc && tsc -p src/sw && tsc -p worker && vite build && vite build -c vite.sw.config.ts",
+    "types": "wrangler types worker/worker-configuration.d.ts",
     "preview": "vite preview",
     "test": "vitest run"
   },

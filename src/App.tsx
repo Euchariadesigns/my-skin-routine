@@ -1,9 +1,13 @@
+import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect } from 'react'
 import { Navigate, Outlet, Route, Routes, useLocation } from 'react-router'
 import { TabBar } from './components/TabBar'
 import { ToastProvider } from './components/Toast'
 import { generateDueNotifications } from './domain/actions'
-import { useSettings } from './hooks/data'
+import { currentReminderPlan } from './domain/reminders'
+import type { Settings } from './domain/types'
+import { useSettings, useToday } from './hooks/data'
+import { stopServerReminders, syncServerReminders } from './lib/push'
 import { History } from './screens/History'
 import { Notifications } from './screens/Notifications'
 import { Plan } from './screens/onboarding/Plan'
@@ -40,6 +44,28 @@ function useReminderTicker(enabled: boolean) {
   }, [enabled])
 }
 
+/**
+ * Keeps the reminder server up to date with this phone's plan, so reminders arrive while the app is closed.
+ * Runs when routines, times or today's logs change, and when the app comes back to the front.
+ */
+function usePushSync(settings?: Settings) {
+  const today = useToday()
+  const plan = useLiveQuery(() => currentReminderPlan(), [today])
+  const want = !!settings?.remindersOn && !!settings.pushOn
+  const planKey = plan ? JSON.stringify(plan) : ''
+  useEffect(() => {
+    if (!settings || !planKey) return
+    const sync = () => { void (want ? syncServerReminders() : stopServerReminders()) }
+    const timer = window.setTimeout(sync, 300)
+    const onVisible = () => { if (document.visibilityState === 'visible') sync() }
+    document.addEventListener('visibilitychange', onVisible)
+    return () => {
+      window.clearTimeout(timer)
+      document.removeEventListener('visibilitychange', onVisible)
+    }
+  }, [want, planKey, !!settings])
+}
+
 function Tabs({ onboarded }: { onboarded: boolean }) {
   if (!onboarded) return <Navigate to="/welcome" replace />
   return (
@@ -53,6 +79,7 @@ function Tabs({ onboarded }: { onboarded: boolean }) {
 export default function App() {
   const settings = useSettings()
   useReminderTicker(!!settings?.onboarded && !!settings?.remindersOn)
+  usePushSync(settings)
   if (!settings) return <div className="page loading" />
   return (
     <ToastProvider>

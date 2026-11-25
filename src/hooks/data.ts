@@ -1,7 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useEffect, useState } from 'react'
-import { db, getSettings } from '../db/db'
-import { loadPlanData } from '../domain/actions'
+import { db, getSettings, loadPlanData } from '../db/db'
 import { todayKey } from '../domain/dates'
 
 export const useSettings = () => useLiveQuery(() => getSettings(), [])
