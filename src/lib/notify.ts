@@ -29,6 +29,21 @@ export async function askForPhoneReminders(): Promise<boolean> {
   }
 }
 
+/** Shows a reminder as a phone notification, if the person turned them on. Tapping it opens `url`. */
+export async function showPhoneNotification(title: string, body: string, url: string, tag: string): Promise<void> {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return
+  try {
+    const reg = await navigator.serviceWorker?.getRegistration()
+    if (reg) {
+      await reg.showNotification(title, { body, tag, data: { url }, icon: '/icons/icon-192.png' })
+      return
+    }
+    new Notification(title, { body, tag })
+  } catch {
+    /* the in-app reminder is still there */
+  }
+}
+
 export const SUPPORT_MESSAGE: Record<Exclude<PhoneReminderSupport, 'ok'>, string> = {
   install: 'On iPhone, phone reminders work once we’re on your Home Screen. Tap the Share button, then “Add to Home Screen”. Open us from there and turn on phone reminders in Alerts.',
   blocked: 'Notifications are turned off for us in your phone’s settings. You can turn them back on there. We’ll still remind you inside the app.',

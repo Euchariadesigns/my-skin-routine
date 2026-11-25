@@ -1,0 +1,11 @@
+{
+  // Cloudflare serves the built app from ./dist. Every unknown path gets the app itself,
+  // so links like /day/2026-11-25 work when opened directly.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "my-skin-routine",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  }
+}

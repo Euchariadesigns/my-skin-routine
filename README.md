@@ -15,5 +15,15 @@ The app only shows your own plan back to you. It doesn't recommend products, jud
 
 ```sh
 npm install
-npm run dev
+npm run dev      # local app at http://localhost:5173
+npm test         # scheduling rules
+npm run build    # production build in dist/
 ```
+
+Everything a person enters (products, photos, routines, history) is stored on their own phone in IndexedDB. Nothing is sent to a server.
+
+## Deploying
+
+The app is a static site served by Cloudflare (see `wrangler.jsonc`). With the GitHub repo connected to Cloudflare Workers Builds, every push to `main` builds with `npm run build` and deploys with `npx wrangler deploy`.
+
+People install it from the browser: on iPhone, open it in Safari and tap Share, then Add to Home Screen; on Android, Chrome offers to install it.

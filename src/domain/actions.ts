@@ -1,4 +1,5 @@
 import { db, getSettings, uid } from '../db/db'
+import { showPhoneNotification } from '../lib/notify'
 import { ALL_DAYS, dateKey, minutesOf } from './dates'
 import { entriesForDate, rotationAfterLog, type Entry, type PlanData } from './schedule'
 import type { LogStatus, Product, Rotation, Routine, RoutineLog, Tod } from './types'
@@ -195,13 +196,19 @@ export async function generateDueNotifications(now = new Date()): Promise<void> 
     if (await db.notifications.get(id)) continue
     const due = entriesForDate(date, plan).filter(e => e.tod === tod && e.status === 'planned')
     if (!due.length) continue
-    await db.notifications.put({
-      id, date, tod, time, createdAt: Date.now(), read: false,
-      items: due.map(e => ({
-        routineName: e.name,
-        productNames: (e.routine?.productIds ?? []).map(pid => products.get(pid)?.name).filter((n): n is string => !!n),
-      })),
-    })
+    const items = due.map(e => ({
+      routineName: e.name,
+      productNames: (e.routine?.productIds ?? []).map(pid => products.get(pid)?.name).filter((n): n is string => !!n),
+    }))
+    await db.notifications.put({ id, date, tod, time, createdAt: Date.now(), read: false, items })
+    if (s.pushOn) {
+      await showPhoneNotification(
+        tod === 'am' ? 'Time for your morning routine' : 'Time for your evening routine',
+        items.map(i => (i.productNames.length ? `${i.routineName}: ${i.productNames.join(' → ')}` : i.routineName)).join('\n'),
+        '/',
+        id,
+      )
+    }
   }
 }
 
