@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router'
 import { Art, type ArtColor, type ArtShape } from '../../components/Art'
 import { Icon } from '../../components/Icon'
 import { MONTHS, WEEKDAYS } from '../../domain/dates'
+import { isInstalled, isIOS } from '../../lib/notify'
 
 const SAMPLE: { name: string; shape: ArtShape; color: ArtColor }[] = [
   { name: 'Face wash', shape: 'pump', color: 'sky' },
@@ -41,6 +42,9 @@ export function Welcome() {
             </div>
           </div>
           <p className="ob-why">Add your morning and night routines once. Each day, we’ll show you what’s next and remind you when it’s time.</p>
+          {isIOS() && !isInstalled() && (
+            <p className="notice">Using an iPhone? Add us to your Home Screen first: tap the Share button, then “Add to Home Screen”, and open us from there. That way your routines and reminders stay together.</p>
+          )}
           <div className="ob-actions">
             <button className="btn btn-primary" type="button" onClick={() => navigate('/plan')}>Add my products</button>
           </div>
