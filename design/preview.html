@@ -88,6 +88,8 @@ a{color:inherit}
 .steps li{display:flex;gap:12px;align-items:baseline;font-size:15px;padding:6px 0;border-bottom:1px dashed var(--line);min-width:0;overflow-wrap:anywhere}
 .steps li:last-child{border-bottom:0}
 .steps .n{font-size:11px;color:var(--ultra);min-width:1.1em}
+.steps li.key{color:var(--ultra)}
+.kp{font-weight:500;color:var(--ultra)}
 .nosteps{margin-top:10px;font-size:13px;color:var(--ink-soft)}
 .tagline{margin-top:8px;font-size:13px;color:var(--ink-soft)}
 .actions{display:flex;align-items:center;gap:6px;margin-top:14px}
@@ -240,11 +242,23 @@ a{color:inherit}
 .ob-actions{margin-top:4px;width:100%;display:flex;flex-direction:column;gap:4px}
 .ob-actions .btn-primary{min-height:56px;font-size:16px;border-radius:16px}
 
-/* add product sheet */
-.sheet-backdrop{position:fixed;inset:0;z-index:70;background:var(--scrim);display:flex;align-items:flex-end;justify-content:center}
-.sheet{width:100%;max-width:460px;max-height:92%;overflow-y:auto;background:var(--paper);border-radius:28px 28px 0 0;padding:10px max(20px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:16px;box-shadow:0 -10px 40px -10px var(--shadow)}
-.grab{width:40px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 4px}
-.sheet h2{font-family:var(--font-display);font-weight:400;font-size:34px;line-height:1}
+/* add product + routine builder: full pages in the normal flow (no overlays), so they scroll in any viewer */
+.sheet-open .app,.sheet-open .tabbar{display:none!important}
+.sheet-page{max-width:440px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px calc(32px + env(safe-area-inset-bottom,0px))}
+.sheet{display:flex;flex-direction:column;gap:18px}
+.sheet-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.sheet h2{font-family:var(--font-display);font-weight:400;font-size:40px;line-height:1}
+.checks{display:flex;flex-direction:column;gap:6px}
+.check{display:flex;align-items:center;gap:10px;font-size:14px;min-height:44px;padding:8px 12px;border-radius:12px;background:var(--face-plain);box-shadow:inset 0 0 0 1px var(--line);cursor:pointer}
+.check input{width:18px;height:18px;margin:0;accent-color:var(--ultra)}
+.order{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.order li{display:flex;align-items:center;gap:10px;min-height:46px;padding:4px 6px 4px 12px;border-radius:12px;background:var(--face-plain);box-shadow:inset 0 0 0 1px var(--line);font-size:14px}
+.order li.key{background:var(--face-pm);color:var(--ultra)}
+.order li.empty{color:var(--ink-soft);font-size:13px;padding:12px}
+.order .n{font-size:11px;color:var(--ink-faint);min-width:1.2em}
+.mv{margin-left:auto;display:flex;gap:4px}
+.mv button{appearance:none;border:0;width:38px;height:38px;border-radius:10px;background:var(--edge);color:var(--ultra);cursor:pointer;box-shadow:inset 0 0 0 1px var(--line);font-size:15px}
+.chips + input[type="text"]{margin-top:8px}
 .sheet-preview{display:flex;justify-content:center}
 .sheet-preview .tile{width:190px}
 .field{display:flex;flex-direction:column;gap:6px;border:0;padding:0;margin:0;min-width:0}
@@ -278,7 +292,7 @@ a{color:inherit}
       <h1 class="ob-title" id="obTitle">plan your skin days.<br>want a <em>reminder</em><br>morning and night?</h1>
       <div class="ob-card" aria-hidden="true">
         <div class="ob-top"><span class="ic" data-icon="moon"></span><span id="obDate"></span><span class="t">9:00 pm</span></div>
-        <div class="ob-panel"><span>tonight</span><span class="rn">Lactic acid night</span><span id="obSteps"></span></div>
+        <div class="ob-panel"><span>tonight</span><span class="rn">Exfoliating evening</span><span id="obSteps"></span></div>
       </div>
       <div class="ob-actions">
         <button class="btn btn-primary" id="obYes" type="button">send me reminders</button>
@@ -311,7 +325,8 @@ a{color:inherit}
   </section>
 
   <section class="view" data-view="routines" id="v-routines" hidden>
-    <header class="pagehead"><span class="label">what you planned</span><h1>routines</h1><p>pausing a schedule keeps the routine and its history.</p></header>
+    <header class="pagehead"><span class="label">what you planned</span><h1>routines</h1><p>each routine is your everyday steps plus its key products. you name it.</p></header>
+    <div class="rot" id="baseBlock"></div>
     <div class="rot" id="rotBlock"></div>
     <div class="rlist" id="rList"></div>
     <button class="btn btn-ghost" id="newRoutine" type="button"><span class="ic" data-icon="plus"></span>new routine</button>
@@ -342,10 +357,9 @@ a{color:inherit}
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 
-<div class="sheet-backdrop" id="sheet" hidden>
-  <form class="sheet" id="addForm" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" novalidate>
-    <div class="grab"></div>
-    <h2 id="sheetTitle">add a product</h2>
+<div class="sheet-page" id="sheet" hidden>
+  <form class="sheet" id="addForm" aria-labelledby="sheetTitle" novalidate>
+    <div class="sheet-top"><h2 id="sheetTitle">add a product</h2><button type="button" class="linkbtn" data-close>cancel</button></div>
     <div class="sheet-preview" id="pPreview"></div>
     <label class="field"><span>name</span><input type="text" id="p-name" autocomplete="off" placeholder="as it’s written on the bottle"></label>
     <fieldset class="field"><legend>category <em>optional</em></legend>
@@ -368,6 +382,44 @@ a{color:inherit}
     </div>
     <p class="err" id="p-err" hidden>add a name to save this product.</p>
     <div class="sheet-actions"><button type="button" class="btn btn-quiet" id="p-cancel">cancel</button><button type="submit" class="btn btn-primary">add to shelf</button></div>
+  </form>
+</div>
+
+<div class="sheet-page" id="rsheet" hidden>
+  <form class="sheet" id="rForm" aria-labelledby="rTitle" novalidate>
+    <div class="sheet-top"><h2 id="rTitle">new routine</h2><button type="button" class="linkbtn" data-close>cancel</button></div>
+    <fieldset class="field"><legend>when</legend>
+      <div class="chips" id="r-tod">
+        <label><input type="radio" name="tod" value="am" checked><span>morning</span></label>
+        <label><input type="radio" name="tod" value="pm"><span>evening</span></label>
+      </div>
+    </fieldset>
+    <fieldset class="field"><legend>your everyday steps <em>untick any you don’t use in this routine</em></legend><div class="checks" id="r-base"></div></fieldset>
+    <fieldset class="field"><legend>what’s the key product in this routine? <em>pick one or more</em></legend><div class="chips" id="r-keys"></div></fieldset>
+    <div class="field"><span>order <em>move key products with the arrows</em></span><ol class="order" id="r-order"></ol></div>
+    <label class="field"><span id="r-name-label">what do you want to call this morning routine?</span><input type="text" id="r-name" autocomplete="off"></label>
+    <fieldset class="field"><legend>tags <em>optional</em></legend>
+      <div class="chips" id="r-tags">
+        <label><input type="checkbox" value="exfoliation"><span>exfoliation</span></label>
+        <label><input type="checkbox" value="recovery"><span>recovery</span></label>
+        <label><input type="checkbox" value="retinoid"><span>retinoid</span></label>
+        <label><input type="checkbox" value="slugging"><span>slugging</span></label>
+      </div>
+      <input type="text" id="r-tag-own" autocomplete="off" placeholder="or type your own tag">
+    </fieldset>
+    <fieldset class="field"><legend>which days <em>optional</em></legend>
+      <div class="chips" id="r-days">
+        <label><input type="checkbox" value="1"><span>mon</span></label>
+        <label><input type="checkbox" value="2"><span>tue</span></label>
+        <label><input type="checkbox" value="3"><span>wed</span></label>
+        <label><input type="checkbox" value="4"><span>thu</span></label>
+        <label><input type="checkbox" value="5"><span>fri</span></label>
+        <label><input type="checkbox" value="6"><span>sat</span></label>
+        <label><input type="checkbox" value="0"><span>sun</span></label>
+      </div>
+    </fieldset>
+    <p class="err" id="r-err" hidden>give this routine a name to save it.</p>
+    <div class="sheet-actions"><button type="button" class="btn btn-quiet" data-close>cancel</button><button type="submit" class="btn btn-primary">save routine</button></div>
   </form>
 </div>
 
@@ -408,24 +460,34 @@ const ART = {
 
 /* ---------- example data ---------- */
 const P = {
-  cleanser: { name: 'gentle cleanser', cat: 'cleanser', art: 'pump', c: 'sky' },
+  facewash: { name: 'face wash', cat: 'cleanser', art: 'pump', c: 'sky' },
+  hydrator: { name: 'hydrator', cat: 'hydrator', art: 'bottle', c: 'peach' },
+  merytino: { name: 'Merytino', cat: 'moisturizer', art: 'jar', c: 'blush' },
+  spf:      { name: 'sunscreen', cat: 'sunscreen' },
   arcwell:  { name: 'Arcwell', cat: 'treatment', art: 'dropper', c: 'butter' },
   nimbosin: { name: 'Nimbosin', cat: 'treatment', art: 'tube', c: 'lilac' },
-  merytino: { name: 'Merytino', cat: 'moisturizer', art: 'jar', c: 'blush' },
   lactic:   { name: 'lactic acid', cat: 'treatment', art: 'bottle', c: 'sage' },
   azelaic:  { name: 'azelaic acid', cat: 'treatment', note: 'tube with the green cap' },
-  spf:      { name: 'sunscreen', cat: 'sunscreen' },
+  balm:     { name: 'night balm', cat: 'other' },
 };
+/* everyday steps, set once per time of day. each routine adds its own key products into them. */
+const BASE = { am: ['facewash', 'hydrator', 'merytino', 'spf'], pm: ['facewash', 'hydrator', 'merytino'] };
 const R = {
-  arcwell:  { id: 'arcwell',  name: 'Arcwell morning',    tod: 'am', steps: ['cleanser','arcwell','merytino','spf'], tags: [] },
-  nimbosin: { id: 'nimbosin', name: 'Nimbosin morning',   tod: 'am', steps: ['cleanser','nimbosin','merytino','spf'], tags: [] },
-  lactic:   { id: 'lactic',   name: 'Lactic acid night',  tod: 'pm', steps: ['cleanser','lactic','merytino'], tags: ['exfoliation'] },
-  recovery: { id: 'recovery', name: 'Recovery night',     tod: 'pm', steps: ['cleanser','merytino'], tags: ['recovery'] },
-  slugging: { id: 'slugging', name: 'Slugging night',     tod: 'pm', steps: [], tags: ['slugging'] },
-  azelaic:  { id: 'azelaic',  name: 'Azelaic acid night', tod: 'pm', steps: ['cleanser','azelaic','merytino'], tags: [], paused: true },
+  arcwell:  { id: 'arcwell',  name: 'Arcwell morning',      tod: 'am', keys: ['arcwell'],  at: 1, skip: [], tags: [] },
+  nimbosin: { id: 'nimbosin', name: 'Nimbosin morning',     tod: 'am', keys: ['nimbosin'], at: 1, skip: [], tags: [] },
+  lactic:   { id: 'lactic',   name: 'Exfoliating evening',  tod: 'pm', keys: ['lactic'],   at: 1, skip: [], tags: ['exfoliation'] },
+  recovery: { id: 'recovery', name: 'Recovery evening',     tod: 'pm', keys: [],           at: 1, skip: [], tags: ['recovery'] },
+  slugging: { id: 'slugging', name: 'Slugging evening',     tod: 'pm', keys: ['balm'],     at: 3, skip: [], tags: ['slugging'] },
+  azelaic:  { id: 'azelaic',  name: 'Azelaic acid evening', tod: 'pm', keys: ['azelaic'],  at: 1, skip: [], tags: [], paused: true },
 };
+const stepsOf = r => {
+  if (r.order) return r.order;
+  const b = BASE[r.tod].filter(k => !r.skip.includes(k)), at = Math.min(r.at, b.length);
+  return [...b.slice(0, at), ...r.keys, ...b.slice(at)];
+};
+const prodLine = r => { const s = stepsOf(r); return s.length ? s.map(k => r.keys.includes(k) ? `<b class="kp">${esc(P[k].name)}</b>` : esc(P[k].name)).join(' → ') : 'no products, label only'; };
 const TAPE = { exfoliation: 'peach', recovery: 'sage', retinoid: 'lilac', slugging: 'sky' };
-const shelf = ['cleanser','arcwell','nimbosin','merytino','lactic','azelaic','spf'].map(k => P[k]);
+const shelf = ['facewash','hydrator','merytino','spf','arcwell','nimbosin','lactic','azelaic','balm'].map(k => P[k]);
 
 const WD = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
 const WDS = ['sun','mon','tue','wed','thu','fri','sat'];
@@ -463,8 +525,9 @@ function morph(el, fn) {
 
 /* ---------- sticker markup ---------- */
 function stepsHTML(r) {
-  if (!r.steps.length) return `<p class="nosteps">no products. this routine is a label for the night.</p>`;
-  return `<ol class="steps">${r.steps.map((k, i) => `<li><span class="n">${i + 1}</span><span>${esc(P[k].name)}</span></li>`).join('')}</ol>`;
+  const s = stepsOf(r);
+  if (!s.length) return `<p class="nosteps">no products. this routine is a label only.</p>`;
+  return `<ol class="steps">${s.map((k, i) => `<li${r.keys.includes(k) ? ' class="key"' : ''}><span class="n">${i + 1}</span><span>${esc(P[k].name)}</span></li>`).join('')}</ol>`;
 }
 function tagLine(r) { return r.tags.length ? `<p class="tagline">you tagged this routine as ${r.tags.map(esc).join(' and ')}.</p>` : ''; }
 function tapes(r) { return r.tags.map((t, i) => `<span class="tape t-${TAPE[t] || 'butter'}" style="--rot:${i ? 4 : -5}deg;--top:${-13 + i * 26}px">${esc(t)}</span>`).join(''); }
@@ -679,8 +742,8 @@ $('#shelfGrid').addEventListener('click', e => { if (e.target.closest('#addTile'
 let draft = { photo: null };
 function readDraft() { return { name: $('#p-name').value.trim(), cat: ($('input[name="cat"]:checked') || {}).value || '', note: $('#p-note').value.trim(), photo: draft.photo }; }
 function updatePreview() { const d = readDraft(); $('#pPreview').innerHTML = tile({ ...d, name: d.name || 'your product' }, 0); }
-function openSheet() { draft = { photo: null }; $('#addForm').reset(); $('#p-paste').textContent = ''; $('#p-err').hidden = true; $('#p-hint').textContent = 'photos stay on your phone.'; updatePreview(); $('#sheet').hidden = false; }
-function closeSheet() { $('#sheet').hidden = true; }
+function openSheet() { draft = { photo: null }; $('#addForm').reset(); $('#p-paste').textContent = ''; $('#p-err').hidden = true; $('#p-hint').textContent = 'photos stay on your phone.'; updatePreview(); document.body.classList.add('sheet-open'); $('#sheet').hidden = false; window.scrollTo(0, 0); }
+function closeSheet() { document.body.classList.remove('sheet-open'); $('#sheet').hidden = true; window.scrollTo(0, 0); }
 async function loadPhoto(file) {
   if (!file || !(file.type || '').startsWith('image/')) { toast('that wasn’t an image. try a photo or a cut-out.'); return; }
   const url = URL.createObjectURL(file), img = new Image(); img.src = url;
@@ -708,31 +771,98 @@ $('#p-paste').addEventListener('paste', e => {
 $('#p-paste').addEventListener('beforeinput', e => { if (e.inputType !== 'insertFromPaste') e.preventDefault(); });
 $('#p-paste').addEventListener('input', e => { e.target.textContent = ''; });
 $('#p-cancel').addEventListener('click', closeSheet);
-$('#sheet').addEventListener('click', e => { if (e.target.id === 'sheet') closeSheet(); });
+$('#addForm [data-close]').addEventListener('click', closeSheet);
 $('#addForm').addEventListener('submit', e => {
   e.preventDefault();
   const d = readDraft();
   if (!d.name) { $('#p-err').hidden = false; $('#p-name').focus(); return; }
-  shelf.unshift(d); closeSheet(); renderShelf(true); toast(`${d.name} is on your shelf`);
+  P['u' + Date.now()] = d; shelf.unshift(d); closeSheet(); renderShelf(true); toast(`${d.name} is on your shelf`);
 });
 
 /* ---------- routines ---------- */
+const SCHED = { arcwell: 'rotation · step 1', nimbosin: 'rotation · step 2', lactic: `weekly · ${PM_LABEL}`, recovery: 'weekly · other evenings', slugging: 'weekly · sat', azelaic: 'weekly · tue · paused' };
 let pendingEdit = null;
 function renderRoutines() {
+  $('#baseBlock').innerHTML = `<span class="label">in every routine unless you untick them</span><h3>everyday steps</h3>
+    <p class="rmeta">${ic('sun')}morning</p><p class="rprods">${BASE.am.map(k => esc(P[k].name)).join(' → ')}</p>
+    <p class="rmeta">${ic('moon')}evening</p><p class="rprods">${BASE.pm.map(k => esc(P[k].name)).join(' → ')}</p>`;
   $('#rotBlock').innerHTML = `<span class="label">rotation · every day</span><h3>morning rotation</h3>
     <div class="seq"><span class="pill cur">${esc(R.arcwell.name)}</span><span class="arrow">→</span><span class="pill">${esc(R.nimbosin.name)}</span><span class="arrow">↺</span></div>
     <p class="rmeta">${state.am.status === 'done' ? `today: ${esc(R.arcwell.name)} completed · next is ${esc(R.nimbosin.name)}` : `on step 1 · last completed yesterday: ${esc(R.nimbosin.name)}`}</p>`;
-  const sched = { arcwell: 'rotation · step 1', nimbosin: 'rotation · step 2', lactic: `weekly · ${PM_LABEL}`, recovery: 'weekly · other evenings', slugging: 'weekly · sat', azelaic: 'weekly · tue · paused' };
   $('#rList').innerHTML = Object.values(R).map(r => `<article class="rcard face-${r.tod}${r.paused ? ' paused' : ''}" data-rid="${r.id}">
     ${tapes(r)}<span class="label">${r.tod === 'am' ? 'morning' : 'evening'}</span><h3>${esc(r.name)}</h3>
-    <p class="rprods">${r.steps.length ? r.steps.map(k => esc(P[k].name)).join(' → ') : 'no products, label only'}</p>
-    <p class="rmeta"><span>${ic(r.tod === 'am' ? 'sun' : 'moon')}${sched[r.id]}</span>${r.paused ? '<span class="chip chip-skip">paused</span>' : ''}</p></article>`).join('');
+    <p class="rprods">${prodLine(r)}</p>
+    <p class="rmeta"><span>${ic(r.tod === 'am' ? 'sun' : 'moon')}${SCHED[r.id] || ''}</span>${r.paused ? '<span class="chip chip-skip">paused</span>' : ''}</p></article>`).join('');
   if (pendingEdit) {
     const c = $(`[data-rid="${pendingEdit}"]`); pendingEdit = null;
     if (c) setTimeout(() => { c.scrollIntoView({ block: 'center', behavior: RM ? 'auto' : 'smooth' }); c.classList.add('flash'); }, 60);
   }
 }
-$('#newRoutine').addEventListener('click', () => toast('the routine builder comes in the full app.'));
+/* routine builder: everyday steps + key products, named by the person */
+const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0];
+const todWord = t => t === 'am' ? 'morning' : 'evening';
+let rb = null;
+function rbRender() {
+  const base = BASE[rb.tod];
+  $('#r-base').innerHTML = base.map(k => `<label class="check"><input type="checkbox" value="${k}"${rb.skip.has(k) ? '' : ' checked'}><span>${esc(P[k].name)}</span></label>`).join('');
+  $('#r-keys').innerHTML = Object.keys(P).filter(k => !base.includes(k)).map(k => `<label><input type="checkbox" value="${k}"${rb.keys.includes(k) ? ' checked' : ''}><span>${esc(P[k].name)}</span></label>`).join('');
+  rbOrder();
+}
+function rbOrder() {
+  $('#r-order').innerHTML = rb.order.length ? rb.order.map((k, i) => {
+    const key = rb.keys.includes(k), nm = esc(P[k].name);
+    return `<li${key ? ' class="key"' : ''}><span class="n">${i + 1}</span><span>${nm}</span>${key ? `<span class="mv"><button type="button" data-mv="-1" data-k="${k}" aria-label="move ${nm} up">↑</button><button type="button" data-mv="1" data-k="${k}" aria-label="move ${nm} down">↓</button></span>` : ''}</li>`;
+  }).join('') : '<li class="empty">no products. this routine will be a label only.</li>';
+  $('#r-name-label').textContent = `what do you want to call this ${todWord(rb.tod)} routine?`;
+  $('#r-name').placeholder = rb.keys.length ? `e.g. ${P[rb.keys[0]].name} ${todWord(rb.tod)}` : `e.g. my usual ${todWord(rb.tod)}`;
+}
+function openBuilder() {
+  rb = { tod: 'am', skip: new Set(), keys: [], order: [...BASE.am] };
+  $('#rForm').reset(); $('#r-err').hidden = true; rbRender();
+  document.body.classList.add('sheet-open'); $('#rsheet').hidden = false; window.scrollTo(0, 0);
+}
+function closeBuilder() { document.body.classList.remove('sheet-open'); $('#rsheet').hidden = true; window.scrollTo(0, 0); }
+$('#newRoutine').addEventListener('click', openBuilder);
+$$('#rForm [data-close]').forEach(b => b.addEventListener('click', closeBuilder));
+$('#r-tod').addEventListener('change', e => { rb.tod = e.target.value; rb.skip = new Set(); rb.keys = []; rb.order = [...BASE[rb.tod]]; rbRender(); });
+$('#r-base').addEventListener('change', e => {
+  const k = e.target.value;
+  if (e.target.checked) {
+    rb.skip.delete(k);
+    const base = BASE[rb.tod], prev = base.slice(0, base.indexOf(k)).reverse().find(b => rb.order.includes(b));
+    rb.order.splice(prev ? rb.order.indexOf(prev) + 1 : 0, 0, k);
+  } else { rb.skip.add(k); rb.order = rb.order.filter(x => x !== k); }
+  rbOrder();
+});
+$('#r-keys').addEventListener('change', e => {
+  const k = e.target.value;
+  if (e.target.checked) {
+    const lastKey = [...rb.order].reverse().find(x => rb.keys.includes(x));
+    rb.keys.push(k);
+    rb.order.splice(lastKey ? rb.order.indexOf(lastKey) + 1 : Math.min(1, rb.order.length), 0, k);
+  } else { rb.keys = rb.keys.filter(x => x !== k); rb.order = rb.order.filter(x => x !== k); }
+  rbOrder();
+});
+$('#r-order').addEventListener('click', e => {
+  const b = e.target.closest('[data-mv]'); if (!b) return;
+  const k = b.dataset.k, i = rb.order.indexOf(k), j = i + Number(b.dataset.mv);
+  if (j < 0 || j >= rb.order.length) return;
+  [rb.order[i], rb.order[j]] = [rb.order[j], rb.order[i]];
+  rbOrder();
+  const again = $(`#r-order [data-k="${k}"][data-mv="${b.dataset.mv}"]`); if (again) again.focus();
+});
+$('#r-name').addEventListener('input', () => { $('#r-err').hidden = true; });
+$('#rForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const name = $('#r-name').value.trim();
+  if (!name) { $('#r-err').hidden = false; $('#r-name').focus(); return; }
+  const tags = $$('#r-tags input:checked').map(i => i.value), own = $('#r-tag-own').value.trim();
+  if (own) tags.push(own);
+  const days = $$('#r-days input:checked').map(i => Number(i.value)), id = 'r' + Date.now();
+  R[id] = { id, name, tod: rb.tod, keys: [...rb.keys], order: [...rb.order], skip: [...rb.skip], tags };
+  SCHED[id] = days.length ? `weekly · ${DAY_ORDER.filter(d => days.includes(d)).map(d => WDS[d]).join(' · ')}` : 'not scheduled yet';
+  closeBuilder(); pendingEdit = id; renderRoutines(); toast(`${name} is saved`);
+});
 
 /* ---------- history ---------- */
 let selK = Math.min(1, TODAY.getDate() - 1);
@@ -768,7 +898,7 @@ function renderHistory() {
   $('#dayLog').innerHTML = `<h3>${dayName(selK)}<span class="sub">${dd.getDate()} ${MO[dd.getMonth()]}</span></h3>` + logsAt(selK).map(l => `
     <article class="log face-${l.tod}"><div class="log-top">${ic(l.tod === 'am' ? 'sun' : 'moon')}${l.tod === 'am' ? 'morning' : 'evening'} · ${l.time}<span class="chip ${l.status === 'completed' ? 'chip-done' : l.status === 'skipped' ? 'chip-skip' : ''}">${l.status}</span></div>
     <p class="log-name">${esc(l.r.name)}</p>
-    <p class="log-prods"><em>${l.status === 'planned' ? 'planned:' : 'as logged:'}</em> ${l.r.steps.length ? l.r.steps.map(s => esc(P[s].name)).join(' → ') : 'no products'}</p>
+    <p class="log-prods"><em>${l.status === 'planned' ? 'planned:' : 'as logged:'}</em> ${prodLine(l.r)}</p>
     ${l.note ? `<p class="log-note">“${esc(l.note)}”</p>` : ''}</article>`).join('');
 }
 $('#calGrid').addEventListener('click', e => { const b = e.target.closest('[data-k]'); if (!b) return; selK = +b.dataset.k; renderHistory(); });
@@ -791,7 +921,7 @@ function renderNotes() {
     const when = nt.k === 0 ? (nt.tod === 'am' ? 'this morning' : 'tonight') : dayName(nt.k);
     return `<button class="note${nt.unread ? ' unread' : ''}" type="button" data-i="${i}">
       <span class="note-when">${ic(nt.tod === 'am' ? 'sun' : 'moon')}${when} · ${time}${nt.unread ? ' · new' : ''}</span>
-      ${noteRoutines(nt).map(r => `<span class="note-r">${esc(r.name)}</span><span class="note-p">${r.steps.length ? r.steps.map(k => esc(P[k].name)).join(' → ') : 'no products'}</span>`).join('')}
+      ${noteRoutines(nt).map(r => `<span class="note-r">${esc(r.name)}</span><span class="note-p">${prodLine(r)}</span>`).join('')}
     </button>`;
   }).join('');
 }
@@ -841,7 +971,7 @@ $('#dNum').textContent = TODAY.getDate();
 $('#dWk').textContent = WD[TODAY.getDay()];
 $('#dMo').textContent = `${MO[TODAY.getMonth()]} ${TODAY.getFullYear()}`;
 $('#obDate').textContent = `${WD[TODAY.getDay()]}, ${String(TODAY.getDate()).padStart(2, '0')}.${String(TODAY.getMonth() + 1).padStart(2, '0')}`;
-$('#obSteps').textContent = R.lactic.steps.map(k => P[k].name).join(' → ');
+$('#obSteps').textContent = stepsOf(R.lactic).map(k => P[k].name).join(' → ');
 renderAM(); renderPM(); renderShelf(); renderBadgeAndLists();
 show(location.hash.slice(1));
 if (!location.hash) openOnboard();
