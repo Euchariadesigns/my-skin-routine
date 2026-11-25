@@ -41,7 +41,7 @@ export function RemindersAsk() {
 
   return (
     <main className="page">
-      <section className="onboard" aria-labelledby="remind-title">
+      <section className="onboard cta-bottom" aria-labelledby="remind-title">
         <div className="ob-inner">
           <h1 className="ob-title" id="remind-title">Want a <em>reminder</em> when it’s time?</h1>
           {routine && (

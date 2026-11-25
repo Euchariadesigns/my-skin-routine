@@ -19,7 +19,7 @@ export function Welcome() {
   const date = `${WEEKDAYS[now.getDay()].slice(0, 3)} ${now.getDate()} ${MONTHS[now.getMonth()].slice(0, 3)}`
   return (
     <main className="page">
-      <section className="onboard" aria-labelledby="welcome-title">
+      <section className="onboard cta-bottom" aria-labelledby="welcome-title">
         <div className="ob-inner">
           <h1 className="ob-title" id="welcome-title">No more guessing which products you used <em>yesterday</em>.</h1>
           <div className="ob-card" role="img" aria-label="An example morning routine with each product pictured in order">
